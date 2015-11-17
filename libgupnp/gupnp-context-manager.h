@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Nokia Corporation, all rights reserved.
+ * Copyright (C) 2009 Nokia Corporation.
  * Copyright (C) 2006, 2007, 2008 OpenedHand Ltd.
  *
  * Author: Zeeshan Ali (Khattak) <zeeshanak@gnome.org>
@@ -17,8 +17,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #ifndef __GUPNP_CONTEXT_MANAGER_H__
@@ -26,6 +26,7 @@
 
 #include <glib.h>
 #include "gupnp.h"
+#include "gupnp-white-list.h"
 
 G_BEGIN_DECLS
 
@@ -54,6 +55,8 @@ gupnp_context_manager_get_type (void) G_GNUC_CONST;
                  GUPnPContextManagerClass))
 
 typedef struct _GUPnPContextManagerPrivate GUPnPContextManagerPrivate;
+typedef struct _GUPnPContextManager GUPnPContextManager;
+typedef struct _GUPnPContextManagerClass GUPnPContextManagerClass;
 
 /**
  * GUPnPContextManager:
@@ -61,13 +64,13 @@ typedef struct _GUPnPContextManagerPrivate GUPnPContextManagerPrivate;
  * This struct contains private data only, and should be accessed using the
  * functions below.
  */
-typedef struct {
+struct _GUPnPContextManager {
         GObject parent;
 
         GUPnPContextManagerPrivate *priv;
-} GUPnPContextManager;
+};
 
-typedef struct {
+struct _GUPnPContextManagerClass {
         GObjectClass parent_class;
 
         /* future padding */
@@ -75,11 +78,21 @@ typedef struct {
         void (* _gupnp_reserved2) (void);
         void (* _gupnp_reserved3) (void);
         void (* _gupnp_reserved4) (void);
-} GUPnPContextManagerClass;
+};
 
+
+#ifndef GUPNP_DISABLE_DEPRECATED
 GUPnPContextManager *
 gupnp_context_manager_new              (GMainContext *main_context,
                                         guint         port);
+#endif
+
+GUPnPContextManager *
+gupnp_context_manager_create           (guint port);
+
+void
+gupnp_context_manager_rescan_control_points
+                                       (GUPnPContextManager *manager);
 
 void
 gupnp_context_manager_manage_control_point
@@ -90,6 +103,12 @@ void
 gupnp_context_manager_manage_root_device
                                        (GUPnPContextManager     *manager,
                                         GUPnPRootDevice         *root_device);
+
+guint
+gupnp_context_manager_get_port         (GUPnPContextManager *manager);
+
+GUPnPWhiteList *
+gupnp_context_manager_get_white_list   (GUPnPContextManager *manager);
 
 G_END_DECLS
 

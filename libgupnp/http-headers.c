@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #include <config.h>
@@ -109,66 +109,6 @@ locale_from_http_language (char *lang)
         return underscore_index;
 }
 
-/* Parses the HTTP Range header on @message and sets:
- *
- * @have_range to %TRUE if a range was specified,
- * @offset to the requested offset (left unchanged if none specified),
- * @length to the requested length (left unchanged if none specified).
- *
- * Both @offset and @length are expected to be initialised to their default
- * values.
- *
- * Returns %TRUE on success. */
-gboolean
-http_request_get_range (SoupMessage *message,
-                        gboolean    *have_range,
-                        gsize       *offset,
-                        gsize       *length)
-{
-        const char *header;
-        char **v;
-
-        header = soup_message_headers_get_one (message->request_headers,
-                                               "Range");
-        if (header == NULL) {
-                *have_range = FALSE;
-
-                return TRUE;
-        }
-
-        /* We have a Range header. Parse. */
-        if (strncmp (header, "bytes=", 6) != 0)
-                return FALSE;
-
-        header += 6;
-
-        v = g_strsplit (header, "-", 2);
-
-        /* Get first byte position */
-        if (v[0] != NULL && *v[0] != 0)
-                *offset = atoll (v[0]);
-
-        else {
-                /* We don't support ranges without first byte position */
-                g_strfreev (v);
-
-                return FALSE;
-        }
-
-        /* Get last byte position if specified */
-        if (v[1] != NULL && *v[1] != 0)
-                *length = atoll (v[1]) - *offset;
-        else
-                *length = *length - *offset;
-
-        *have_range = TRUE;
-
-        /* Cleanup */
-        g_strfreev (v);
-
-        return TRUE;
-}
-
 /* Sets the Accept-Language on @message with the language taken from the
  * current locale. */
 void
@@ -178,7 +118,13 @@ http_request_set_accept_language (SoupMessage *message)
         int dash_index;
         GString *tmp;
 
-        locale = setlocale (LC_ALL, NULL);
+#ifdef G_OS_WIN32
+        /* TODO: Use GetSystemDefaultLangID or similar */
+        return;
+#else
+
+        locale = setlocale (LC_MESSAGES, NULL);
+
         if (locale == NULL)
                 return;
 
@@ -209,6 +155,7 @@ http_request_set_accept_language (SoupMessage *message)
                                      tmp->str);
 
         g_string_free (tmp, TRUE);
+#endif
 }
 
 static double
@@ -332,25 +279,55 @@ http_response_set_content_type (SoupMessage  *msg,
         g_free (content_type);
 }
 
-/* Set Content-Range header */
+/* Set Content-Encoding header to gzip and append compressed body */
 void
-http_response_set_content_range (SoupMessage  *msg,
-                                 gsize         offset,
-                                 gsize         length,
-                                 gsize         total)
+http_response_set_body_gzip (SoupMessage *msg,
+                             const char  *body,
+                             const gsize  length)
 {
-        char *content_range;
-
-        content_range = g_strdup_printf
-                ("bytes %" G_GSIZE_FORMAT "-%"
-                 G_GSIZE_FORMAT "/%" G_GSIZE_FORMAT,
-                 offset,
-                 offset + length,
-                 total);
+        GZlibCompressor *compressor;
+        gboolean finished = FALSE;
+        gsize converted = 0;
 
         soup_message_headers_append (msg->response_headers,
-                                     "Content-Range",
-                                     content_range);
+                                     "Content-Encoding", "gzip");
 
-        g_free (content_range);
+        compressor = g_zlib_compressor_new (G_ZLIB_COMPRESSOR_FORMAT_GZIP, -1);
+
+        while (! finished) {
+                GError *error = NULL;
+                char buf[65536];
+                gsize bytes_read = 0;
+                gsize bytes_written = 0;
+
+                switch (g_converter_convert (G_CONVERTER (compressor),
+                                             body + converted,
+                                             length - converted,
+                                             buf, sizeof (buf),
+                                             G_CONVERTER_INPUT_AT_END,
+                                             &bytes_read, &bytes_written,
+                                             &error)) {
+                case G_CONVERTER_ERROR:
+                        g_warning ("Error compressing response: %s",
+                                   error->message);
+                        g_error_free (error);
+                        g_object_unref (compressor);
+                        return;
+                case G_CONVERTER_CONVERTED:
+                        converted += bytes_read;
+                        break;
+                case G_CONVERTER_FINISHED:
+                        finished = TRUE;
+                        break;
+                case G_CONVERTER_FLUSHED:
+                        break;
+                }
+
+                if (bytes_written)
+                        soup_message_body_append (msg->response_body,
+                                                  SOUP_MEMORY_COPY,
+                                                  buf, bytes_written);
+        }
+
+        g_object_unref (compressor);
 }

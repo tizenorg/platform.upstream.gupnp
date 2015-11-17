@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 /**
@@ -65,6 +65,7 @@ gupnp_root_device_finalize (GObject *object)
 
         device = GUPNP_ROOT_DEVICE (object);
 
+        g_object_unref (device->priv->description_doc);
         g_free (device->priv->description_path);
         g_free (device->priv->description_dir);
         g_free (device->priv->relative_location);
@@ -85,11 +86,6 @@ gupnp_root_device_dispose (GObject *object)
         if (device->priv->group) {
                 g_object_unref (device->priv->group);
                 device->priv->group = NULL;
-        }
-
-        if (device->priv->description_doc) {
-                g_object_unref (device->priv->description_doc);
-                device->priv->description_doc = NULL;
         }
 
         /* Call super */
@@ -408,7 +404,11 @@ gupnp_root_device_constructor (GType                  type,
         device = GUPNP_ROOT_DEVICE (object);
 
         /* Generate location relative to HTTP root */
-        device->priv->relative_location = g_strdup_printf ("RootDevice%p.xml",                                                             object);
+        udn = gupnp_device_info_get_udn (GUPNP_DEVICE_INFO (device));
+        if (udn && strstr (udn, "uuid:") == udn)
+                device->priv->relative_location = g_strdup_printf ("%s.xml", udn + 5);
+        else
+                device->priv->relative_location = g_strdup_printf ("RootDevice%p.xml", device);
 
         relative_location = g_strjoin (NULL,
                                        "/",
@@ -445,7 +445,6 @@ gupnp_root_device_constructor (GType                  type,
         device->priv->group = gssdp_resource_group_new (GSSDP_CLIENT (context));
 
         /* Add services and devices to resource group */
-        udn = gupnp_device_info_get_udn (GUPNP_DEVICE_INFO (device));
         usn = g_strdup_printf ("%s::upnp:rootdevice", (const char *) udn);
         gssdp_resource_group_add_resource_simple (device->priv->group,
                                                   "upnp:rootdevice",
@@ -457,6 +456,7 @@ gupnp_root_device_constructor (GType                  type,
 
  DONE:
         /* Cleanup */
+        g_free (desc_path);
         g_free (location);
 
         return object;
@@ -552,7 +552,7 @@ gupnp_root_device_class_init (GUPnPRootDeviceClass *klass)
 }
 
 /**
- * gupnp_root_device_new
+ * gupnp_root_device_new:
  * @context: The #GUPnPContext
  * @description_path: Path to device description document. This could either
  * be an absolute path or path relative to @description_dir.
@@ -697,4 +697,20 @@ gupnp_root_device_get_description_dir (GUPnPRootDevice *root_device)
         g_return_val_if_fail (GUPNP_IS_ROOT_DEVICE (root_device), NULL);
 
         return root_device->priv->description_dir;
+}
+
+/**
+ * gupnp_root_device_get_ssdp_resource_group:
+ * @root_device: A #GUPnPRootDevice
+ *
+ * Get the #GSSDPResourceGroup used by @root_device.
+ *
+ * Returns: (transfer none): The #GSSDPResourceGroup of @root_device.
+ **/
+GSSDPResourceGroup *
+gupnp_root_device_get_ssdp_resource_group (GUPnPRootDevice *root_device)
+{
+        g_return_val_if_fail (GUPNP_IS_ROOT_DEVICE (root_device), NULL);
+
+        return root_device->priv->group;
 }

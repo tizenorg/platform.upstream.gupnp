@@ -1,42 +1,38 @@
 Name: gupnp
-Version: 0.14.1_6
-Release: 1
-Summary: GUPNP
-Group: <group>/<group>
+Summary:    GUPnP is an framework for creating UPnP devices & control points
+Version:    0.20.5
+Release:    1
+Group:      System/Libraries
 License: LGPL-2.0+
-URL: http://www.gupnp.org/
+URL:        http://www.gupnp.org/
 Source0: %{name}-%{version}.tar.gz
-Patch1: missed_service_node_bug.patch
-BuildRequires:  pkgconfig(glib-2.0) >= 2.18
-BuildRequires:  pkgconfig(gobject-2.0) >= 2.18
+BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(gio-2.0)
 BuildRequires:  pkgconfig(gmodule-2.0)
-BuildRequires:  pkgconfig(gssdp-1.0) >= 0.7.1
-BuildRequires:  pkgconfig(libsoup-2.4) >= 2.4.1
-BuildRequires:	pkgconfig(libxml-2.0)
-# need dbus-glib-1 for use network-manager
-BuildRequires:	pkgconfig(dbus-glib-1) >= 0.76
-BuildRequires:	pkgconfig(uuid)
-BuildRequires:	pkgconfig(gthread-2.0)
-BuildRequires:  autoconf >= 2.67
+BuildRequires:  pkgconfig(gssdp-1.0)
+BuildRequires:  pkgconfig(libsoup-2.4)
+BuildRequires:  pkgconfig(libxml-2.0)
+BuildRequires:  pkgconfig(uuid)
+#BuildRequires:  gobject-introspection-devel
+#BuildRequires:  vala
+
+
 %description
-GUPnP is an object-oriented open source framework for creating UPnP devices and
-control points, written in C using GObject and libsoup. The GUPnP API is
-intended to be easy to use, efficient and flexible.
+GUPnP is an object-oriented open source framework for creating UPnP 
+devices and control points, written in C using GObject and libsoup. 
+The GUPnP API is intended to be easy to use, efficient and flexible.
 
 %package devel
-Summary:    GUPNP (devel)
-Group:      Development/Headers
+Summary:    Development package for gupnp
+Group:      Development/Libraries
 License:    LGPL-2.0+
 Requires:   %{name} = %{version}-%{release}
 
 %description devel
-GUPnP is an object-oriented open source framework for creating UPnP devices and
-control points, written in C using GObject and libsoup. The GUPnP API is
-intended to be easy to use, efficient and flexible.
+Files for development with gupnp.
 
 %prep
-%setup -q
-%patch1 -p1
+%setup -q -n %{name}-%{version}
   
 %build  
 %configure --prefix=/usr --with-context-manager=network-manager

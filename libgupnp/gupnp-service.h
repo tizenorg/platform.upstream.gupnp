@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #ifndef __GUPNP_SERVICE_H__
@@ -53,7 +53,7 @@ gupnp_service_get_type (void) G_GNUC_CONST;
                  GUPnPServiceClass))
 
 /**
- * GUPnPServiceAction
+ * GUPnPServiceAction:
  *
  * Opaque structure for holding in-progress action data.
  **/
@@ -65,6 +65,8 @@ gupnp_service_action_get_type (void) G_GNUC_CONST;
 #define GUPNP_TYPE_SERVICE_ACTION (gupnp_service_action_get_type ())
 
 typedef struct _GUPnPServicePrivate GUPnPServicePrivate;
+typedef struct _GUPnPService GUPnPService;
+typedef struct _GUPnPServiceClass GUPnPServiceClass;
 
 /**
  * GUPnPService:
@@ -72,15 +74,16 @@ typedef struct _GUPnPServicePrivate GUPnPServicePrivate;
  * This struct contains private data only, and should be accessed using the
  * functions below.
  */
-typedef struct {
+struct _GUPnPService {
         GUPnPServiceInfo parent;
 
         GUPnPServicePrivate *priv;
-} GUPnPService;
+};
 
-typedef struct {
+struct _GUPnPServiceClass {
         GUPnPServiceInfoClass parent_class;
 
+        /* <signals> */
         void (* action_invoked) (GUPnPService       *service,
                                  GUPnPServiceAction *action);
 
@@ -97,11 +100,8 @@ typedef struct {
         void (* _gupnp_reserved2) (void);
         void (* _gupnp_reserved3) (void);
         void (* _gupnp_reserved4) (void);
-} GUPnPServiceClass;
+};
 
-
-GType
-gupnp_service_action_get_type (void);
 
 const char *
 gupnp_service_action_get_name     (GUPnPServiceAction *action);
@@ -160,6 +160,10 @@ gupnp_service_action_return_error (GUPnPServiceAction *action,
 
 SoupMessage *
 gupnp_service_action_get_message  (GUPnPServiceAction *action);
+
+guint
+gupnp_service_action_get_argument_count
+                                  (GUPnPServiceAction *action);
 
 void
 gupnp_service_notify              (GUPnPService *service,

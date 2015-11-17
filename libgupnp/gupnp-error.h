@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #ifndef __GUPNP_ERROR_H__
@@ -104,6 +104,7 @@ gupnp_xml_error_quark (void) G_GNUC_CONST;
  * @GUPNP_XML_ERROR_PARSE: Generic XML parsing error.
  * @GUPNP_XML_ERROR_NO_NODE: A required XML node was not found.
  * @GUPNP_XML_ERROR_EMPTY_NODE: An XML node is unexpectedly empty.
+ * @GUPNP_XML_ERROR_INVALID_ATTRIBUTE: An XML node has an unknown attribute.
  * @GUPNP_XML_ERROR_OTHER: Unknown/unhandled XML related errors.
  *
  * #GError codes used for errors in the #GUPNP_XML_ERROR domain, during
@@ -113,6 +114,7 @@ typedef enum {
         GUPNP_XML_ERROR_PARSE,
         GUPNP_XML_ERROR_NO_NODE,
         GUPNP_XML_ERROR_EMPTY_NODE,
+        GUPNP_XML_ERROR_INVALID_ATTRIBUTE,
         GUPNP_XML_ERROR_OTHER
 } GUPnPXMLError;
 

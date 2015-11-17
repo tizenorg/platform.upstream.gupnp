@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 /**
@@ -109,9 +109,9 @@ gupnp_control_point_init (GUPnPControlPoint *control_point)
 
 /* Return TRUE if value == user_data */
 static gboolean
-find_doc (gpointer key,
-          gpointer value,
-          gpointer user_data)
+find_doc (G_GNUC_UNUSED gpointer key,
+          gpointer               value,
+          G_GNUC_UNUSED gpointer user_data)
 {
         return (value == user_data);
 }
@@ -132,9 +132,9 @@ doc_finalized (gpointer user_data,
 
 /* Release weak reference on xmlDoc wrapper */
 static void
-weak_unref_doc (gpointer key,
-                gpointer value,
-                gpointer user_data)
+weak_unref_doc (G_GNUC_UNUSED gpointer key,
+                gpointer               value,
+                gpointer               user_data)
 {
         g_object_weak_unref (G_OBJECT (value), doc_finalized, user_data);
 }
@@ -213,7 +213,7 @@ find_service_node (GUPnPControlPoint *control_point,
 
                 info = GUPNP_SERVICE_INFO (l->data);
 
-                if ((strcmp (gupnp_service_info_get_udn (info), udn) == 0) ||
+                if ((strcmp (gupnp_service_info_get_udn (info), udn) == 0) &&
                     (strcmp (gupnp_service_info_get_service_type (info),
                              service_type) == 0))
                         break;
@@ -323,6 +323,44 @@ create_and_report_device_proxy (GUPnPControlPoint  *control_point,
                        proxy);
 }
 
+static gboolean
+compare_service_types_versioned (const char *searched_service,
+                                 const char *current_service)
+{
+        const char *searched_version_ptr, *current_version_ptr;
+        guint searched_version, current_version, searched_length;
+        guint current_length;
+
+        searched_version_ptr = strrchr (searched_service, ':');
+        if (searched_version_ptr == NULL)
+                return FALSE;
+
+        current_version_ptr = strrchr (current_service, ':');
+        if (current_version_ptr == NULL)
+                return FALSE;
+
+        searched_length = (searched_version_ptr - searched_service);
+        current_length = (current_version_ptr - current_service);
+
+        if (searched_length != current_length)
+                return FALSE;
+
+        searched_version = (guint) atol (searched_version_ptr + 1);
+        if (searched_version == 0)
+                return FALSE;
+
+        current_version = (guint) atol (current_version_ptr + 1);
+        if (current_version == 0)
+                return FALSE;
+
+        if (current_version < searched_version)
+                return FALSE;
+
+        return strncmp (searched_service,
+                        current_service,
+                        searched_length) == 0;
+}
+
 /* Search @element for matching services */
 static void
 process_service_list (xmlNode           *element,
@@ -348,8 +386,8 @@ process_service_list (xmlNode           *element,
                 if (!prop)
                         continue;
 
-                match = (strcmp ((char *) prop, service_type) == 0);
-
+                match = compare_service_types_versioned (service_type,
+                                                         (char *) prop);
                 xmlFree (prop);
 
                 if (!match)
@@ -471,9 +509,6 @@ description_loaded (GUPnPControlPoint *control_point,
                 return;
         }
 
-        if (element == NULL)
-                return;
-
         url_base = xml_util_get_child_element_content_uri (element,
                                                            "URLBase",
                                                            NULL);
@@ -497,9 +532,9 @@ description_loaded (GUPnPControlPoint *control_point,
  * Description URL downloaded.
  */
 static void
-got_description_url (SoupSession           *session,
-                     SoupMessage           *msg,
-                     GetDescriptionURLData *data)
+got_description_url (G_GNUC_UNUSED SoupSession *session,
+                     SoupMessage               *msg,
+                     GetDescriptionURLData     *data)
 {
         GUPnPXMLDoc *doc;
 
@@ -749,7 +784,6 @@ gupnp_control_point_resource_unavailable
 {
         GUPnPControlPoint *control_point;
         char *udn, *service_type;
-        GList *l, *cur_l;
 
         control_point = GUPNP_CONTROL_POINT (resource_browser);
 
@@ -759,7 +793,7 @@ gupnp_control_point_resource_unavailable
 
         /* Find proxy */
         if (service_type) {
-                l = find_service_node (control_point, udn, service_type);
+                GList *l = find_service_node (control_point, udn, service_type);
 
                 if (l) {
                         GUPnPServiceProxy *proxy;
@@ -767,12 +801,9 @@ gupnp_control_point_resource_unavailable
                         /* Remove proxy */
                         proxy = GUPNP_SERVICE_PROXY (l->data);
 
-                        cur_l = l;
-                        l = l->next;
-
                         control_point->priv->services =
                                 g_list_delete_link
-                                        (control_point->priv->services, cur_l);
+                                        (control_point->priv->services, l);
 
                         g_signal_emit (control_point,
                                        signals[SERVICE_PROXY_UNAVAILABLE],
@@ -782,7 +813,7 @@ gupnp_control_point_resource_unavailable
                         g_object_unref (proxy);
                 }
         } else {
-                l = find_device_node (control_point, udn);
+                GList *l = find_device_node (control_point, udn);
 
                 if (l) {
                         GUPnPDeviceProxy *proxy;
@@ -790,12 +821,9 @@ gupnp_control_point_resource_unavailable
                         /* Remove proxy */
                         proxy = GUPNP_DEVICE_PROXY (l->data);
 
-                        cur_l = l;
-                        l = l->next;
-
                         control_point->priv->devices =
                                  g_list_delete_link
-                                        (control_point->priv->devices, cur_l);
+                                        (control_point->priv->devices, l);
 
                         g_signal_emit (control_point,
                                        signals[DEVICE_PROXY_UNAVAILABLE],
@@ -1041,7 +1069,7 @@ gupnp_control_point_new_full (GUPnPContext         *context,
  *
  * Get the #GUPnPControlPoint associated with @control_point.
  *
- * Return value: The #GUPnPContext.
+ * Returns: (transfer none): The #GUPnPContext.
  **/
 GUPnPContext *
 gupnp_control_point_get_context (GUPnPControlPoint *control_point)
@@ -1081,7 +1109,7 @@ gupnp_control_point_list_device_proxies (GUPnPControlPoint *control_point)
  * Get the #GList of discovered #GUPnPServiceProxy objects. Do not free the
  * list nor its elements.
  *
- * Return value: (element-type: GUPnP.ServiceProxy) (transfer none): a #GList
+ * Return value: (element-type GUPnP.ServiceProxy) (transfer none): a #GList
  * of #GUPnPServiceProxy objects.
  **/
 const GList *
@@ -1098,7 +1126,7 @@ gupnp_control_point_list_service_proxies (GUPnPControlPoint *control_point)
  *
  * Get the #GUPnPResourceFactory used by the @control_point.
  *
- * Return value: A #GUPnPResourceFactory.
+ * Returns: (transfer none): A #GUPnPResourceFactory.
  **/
 GUPnPResourceFactory *
 gupnp_control_point_get_resource_factory (GUPnPControlPoint *control_point)

@@ -17,8 +17,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #include <libgupnp/gupnp-control-point.h>
@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <glib.h>
 
 GMainLoop *main_loop;
 
@@ -38,7 +39,7 @@ static GOptionEntry entries[] =
 };
 
 static void
-interrupt_signal_handler (int signum)
+interrupt_signal_handler (G_GNUC_UNUSED int signum)
 {
         g_main_loop_quit (main_loop);
 }
@@ -172,7 +173,7 @@ static void
 got_introspection (GUPnPServiceInfo          *info,
                    GUPnPServiceIntrospection *introspection,
                    const GError              *error,
-                   gpointer                   user_data)
+                   G_GNUC_UNUSED gpointer     user_data)
 {
         if (error) {
                 g_warning ("Failed to create introspection for '%s': %s",
@@ -191,8 +192,8 @@ got_introspection (GUPnPServiceInfo          *info,
 }
 
 static void
-service_proxy_available_cb (GUPnPControlPoint *cp,
-                            GUPnPServiceProxy *proxy)
+service_proxy_available_cb (G_GNUC_UNUSED GUPnPControlPoint *cp,
+                            GUPnPServiceProxy               *proxy)
 {
         GUPnPServiceInfo *info;
         GUPnPServiceIntrospection *introspection;
@@ -215,8 +216,8 @@ service_proxy_available_cb (GUPnPControlPoint *cp,
 }
 
 static void
-service_proxy_unavailable_cb (GUPnPControlPoint *cp,
-                              GUPnPServiceProxy *proxy)
+service_proxy_unavailable_cb (G_GNUC_UNUSED GUPnPControlPoint *cp,
+                              GUPnPServiceProxy               *proxy)
 {
         const char *type, *location;
 
@@ -235,7 +236,9 @@ main (int argc, char **argv)
         GUPnPContext *context;
         GUPnPControlPoint *cp;
         GOptionContext *option_context;
+#ifndef G_OS_WIN32
         struct sigaction sig_action;
+#endif /* G_OS_WIN32 */
 
         option_context = g_option_context_new ("- test GUPnP introspection");
         g_option_context_add_main_entries (option_context,
@@ -253,11 +256,12 @@ main (int argc, char **argv)
                 return EXIT_FAILURE;
         }
 		
-        g_thread_init (NULL);
+#if !GLIB_CHECK_VERSION(2,35,0)
         g_type_init ();
+#endif
 
         error = NULL;
-        context = gupnp_context_new (NULL, NULL, 0, &error);
+        context = g_initable_new (GUPNP_TYPE_CONTEXT, NULL, &error, NULL);
         if (error) {
                 g_printerr ("Error creating the GUPnP context: %s\n",
 			    error->message);
@@ -283,9 +287,13 @@ main (int argc, char **argv)
         main_loop = g_main_loop_new (NULL, FALSE);
 
         /* Hook the handler for SIGTERM */
+#ifndef G_OS_WIN32
         memset (&sig_action, 0, sizeof (sig_action));
         sig_action.sa_handler = interrupt_signal_handler;
         sigaction (SIGINT, &sig_action, NULL);
+#else
+        signal(SIGINT,interrupt_signal_handler);
+#endif /* G_OS_WIN32 */
 
         g_main_loop_run (main_loop);
         g_main_loop_unref (main_loop);

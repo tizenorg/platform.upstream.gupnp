@@ -23,6 +23,7 @@
 <ANCHOR id="gupnp-device-info-get-upc" href="gupnp/GUPnPDeviceInfo.html#gupnp-device-info-get-upc">
 <ANCHOR id="gupnp-device-info-get-icon-url" href="gupnp/GUPnPDeviceInfo.html#gupnp-device-info-get-icon-url">
 <ANCHOR id="gupnp-device-info-list-dlna-capabilities" href="gupnp/GUPnPDeviceInfo.html#gupnp-device-info-list-dlna-capabilities">
+<ANCHOR id="gupnp-device-info-list-dlna-device-class-identifier" href="gupnp/GUPnPDeviceInfo.html#gupnp-device-info-list-dlna-device-class-identifier">
 <ANCHOR id="gupnp-device-info-get-description-value" href="gupnp/GUPnPDeviceInfo.html#gupnp-device-info-get-description-value">
 <ANCHOR id="gupnp-device-info-list-devices" href="gupnp/GUPnPDeviceInfo.html#gupnp-device-info-list-devices">
 <ANCHOR id="gupnp-device-info-list-device-types" href="gupnp/GUPnPDeviceInfo.html#gupnp-device-info-list-device-types">
@@ -170,6 +171,7 @@
 <ANCHOR id="gupnp-root-device-get-relative-location" href="gupnp/GUPnPRootDevice.html#gupnp-root-device-get-relative-location">
 <ANCHOR id="gupnp-root-device-get-description-dir" href="gupnp/GUPnPRootDevice.html#gupnp-root-device-get-description-dir">
 <ANCHOR id="gupnp-root-device-get-description-path" href="gupnp/GUPnPRootDevice.html#gupnp-root-device-get-description-path">
+<ANCHOR id="gupnp-root-device-get-ssdp-resource-group" href="gupnp/GUPnPRootDevice.html#gupnp-root-device-get-ssdp-resource-group">
 <ANCHOR id="GUPnPRootDevice.property-details" href="gupnp/GUPnPRootDevice.html#GUPnPRootDevice.property-details">
 <ANCHOR id="GUPnPRootDevice--available" href="gupnp/GUPnPRootDevice.html#GUPnPRootDevice--available">
 <ANCHOR id="GUPnPRootDevice--description-dir" href="gupnp/GUPnPRootDevice.html#GUPnPRootDevice--description-dir">
@@ -177,13 +179,14 @@
 <ANCHOR id="GUPnPRootDevice--description-path" href="gupnp/GUPnPRootDevice.html#GUPnPRootDevice--description-path">
 <ANCHOR id="GUPnPService" href="gupnp/GUPnPService.html">
 <ANCHOR id="GUPnPService.synopsis" href="gupnp/GUPnPService.html#GUPnPService.synopsis">
+<ANCHOR id="GUPnPServiceAction" href="gupnp/GUPnPService.html#GUPnPServiceAction">
 <ANCHOR id="GUPnPService.object-hierarchy" href="gupnp/GUPnPService.html#GUPnPService.object-hierarchy">
 <ANCHOR id="GUPnPService.properties" href="gupnp/GUPnPService.html#GUPnPService.properties">
 <ANCHOR id="GUPnPService.signals" href="gupnp/GUPnPService.html#GUPnPService.signals">
 <ANCHOR id="GUPnPService.description" href="gupnp/GUPnPService.html#GUPnPService.description">
 <ANCHOR id="GUPnPService.details" href="gupnp/GUPnPService.html#GUPnPService.details">
 <ANCHOR id="GUPnPService-struct" href="gupnp/GUPnPService.html#GUPnPService-struct">
-<ANCHOR id="GUPnPServiceAction" href="gupnp/GUPnPService.html#GUPnPServiceAction">
+<ANCHOR id="GUPnPServiceAction-struct" href="gupnp/GUPnPService.html#GUPnPServiceAction-struct">
 <ANCHOR id="gupnp-service-action-get-name" href="gupnp/GUPnPService.html#gupnp-service-action-get-name">
 <ANCHOR id="gupnp-service-action-get-locales" href="gupnp/GUPnPService.html#gupnp-service-action-get-locales">
 <ANCHOR id="gupnp-service-action-get" href="gupnp/GUPnPService.html#gupnp-service-action-get">
@@ -198,6 +201,7 @@
 <ANCHOR id="gupnp-service-action-return" href="gupnp/GUPnPService.html#gupnp-service-action-return">
 <ANCHOR id="gupnp-service-action-return-error" href="gupnp/GUPnPService.html#gupnp-service-action-return-error">
 <ANCHOR id="gupnp-service-action-get-message" href="gupnp/GUPnPService.html#gupnp-service-action-get-message">
+<ANCHOR id="gupnp-service-action-get-argument-count" href="gupnp/GUPnPService.html#gupnp-service-action-get-argument-count">
 <ANCHOR id="gupnp-service-notify" href="gupnp/GUPnPService.html#gupnp-service-notify">
 <ANCHOR id="gupnp-service-notify-valist" href="gupnp/GUPnPService.html#gupnp-service-notify-valist">
 <ANCHOR id="gupnp-service-notify-value" href="gupnp/GUPnPService.html#gupnp-service-notify-value">
@@ -213,6 +217,7 @@
 <ANCHOR id="GUPnPContext" href="gupnp/GUPnPContext.html">
 <ANCHOR id="GUPnPContext.synopsis" href="gupnp/GUPnPContext.html#GUPnPContext.synopsis">
 <ANCHOR id="GUPnPContext.object-hierarchy" href="gupnp/GUPnPContext.html#GUPnPContext.object-hierarchy">
+<ANCHOR id="GUPnPContext.implemented-interfaces" href="gupnp/GUPnPContext.html#GUPnPContext.implemented-interfaces">
 <ANCHOR id="GUPnPContext.properties" href="gupnp/GUPnPContext.html#GUPnPContext.properties">
 <ANCHOR id="GUPnPContext.description" href="gupnp/GUPnPContext.html#GUPnPContext.description">
 <ANCHOR id="GUPnPContext.details" href="gupnp/GUPnPContext.html#GUPnPContext.details">
@@ -224,10 +229,13 @@
 <ANCHOR id="gupnp-context-get-session" href="gupnp/GUPnPContext.html#gupnp-context-get-session">
 <ANCHOR id="gupnp-context-set-subscription-timeout" href="gupnp/GUPnPContext.html#gupnp-context-set-subscription-timeout">
 <ANCHOR id="gupnp-context-get-subscription-timeout" href="gupnp/GUPnPContext.html#gupnp-context-get-subscription-timeout">
+<ANCHOR id="gupnp-context-get-default-language" href="gupnp/GUPnPContext.html#gupnp-context-get-default-language">
+<ANCHOR id="gupnp-context-set-default-language" href="gupnp/GUPnPContext.html#gupnp-context-set-default-language">
 <ANCHOR id="gupnp-context-host-path" href="gupnp/GUPnPContext.html#gupnp-context-host-path">
 <ANCHOR id="gupnp-context-host-path-for-agent" href="gupnp/GUPnPContext.html#gupnp-context-host-path-for-agent">
 <ANCHOR id="gupnp-context-unhost-path" href="gupnp/GUPnPContext.html#gupnp-context-unhost-path">
 <ANCHOR id="GUPnPContext.property-details" href="gupnp/GUPnPContext.html#GUPnPContext.property-details">
+<ANCHOR id="GUPnPContext--default-language" href="gupnp/GUPnPContext.html#GUPnPContext--default-language">
 <ANCHOR id="GUPnPContext--port" href="gupnp/GUPnPContext.html#GUPnPContext--port">
 <ANCHOR id="GUPnPContext--server" href="gupnp/GUPnPContext.html#GUPnPContext--server">
 <ANCHOR id="GUPnPContext--session" href="gupnp/GUPnPContext.html#GUPnPContext--session">
@@ -241,15 +249,34 @@
 <ANCHOR id="GUPnPContextManager.details" href="gupnp/GUPnPContextManager.html#GUPnPContextManager.details">
 <ANCHOR id="GUPnPContextManager-struct" href="gupnp/GUPnPContextManager.html#GUPnPContextManager-struct">
 <ANCHOR id="gupnp-context-manager-new" href="gupnp/GUPnPContextManager.html#gupnp-context-manager-new">
+<ANCHOR id="gupnp-context-manager-create" href="gupnp/GUPnPContextManager.html#gupnp-context-manager-create">
+<ANCHOR id="gupnp-context-manager-rescan-control-points" href="gupnp/GUPnPContextManager.html#gupnp-context-manager-rescan-control-points">
 <ANCHOR id="gupnp-context-manager-manage-control-point" href="gupnp/GUPnPContextManager.html#gupnp-context-manager-manage-control-point">
 <ANCHOR id="gupnp-context-manager-manage-root-device" href="gupnp/GUPnPContextManager.html#gupnp-context-manager-manage-root-device">
+<ANCHOR id="gupnp-context-manager-get-port" href="gupnp/GUPnPContextManager.html#gupnp-context-manager-get-port">
+<ANCHOR id="gupnp-context-manager-get-white-list" href="gupnp/GUPnPContextManager.html#gupnp-context-manager-get-white-list">
 <ANCHOR id="GUPnPContextManager.property-details" href="gupnp/GUPnPContextManager.html#GUPnPContextManager.property-details">
-<ANCHOR id="GUPnPContextManager--context-manager" href="gupnp/GUPnPContextManager.html#GUPnPContextManager--context-manager">
 <ANCHOR id="GUPnPContextManager--main-context" href="gupnp/GUPnPContextManager.html#GUPnPContextManager--main-context">
 <ANCHOR id="GUPnPContextManager--port" href="gupnp/GUPnPContextManager.html#GUPnPContextManager--port">
+<ANCHOR id="GUPnPContextManager--white-list" href="gupnp/GUPnPContextManager.html#GUPnPContextManager--white-list">
 <ANCHOR id="GUPnPContextManager.signal-details" href="gupnp/GUPnPContextManager.html#GUPnPContextManager.signal-details">
 <ANCHOR id="GUPnPContextManager-context-available" href="gupnp/GUPnPContextManager.html#GUPnPContextManager-context-available">
 <ANCHOR id="GUPnPContextManager-context-unavailable" href="gupnp/GUPnPContextManager.html#GUPnPContextManager-context-unavailable">
+<ANCHOR id="GUPnPWhiteList" href="gupnp/GUPnPWhiteList.html">
+<ANCHOR id="GUPnPWhiteList.synopsis" href="gupnp/GUPnPWhiteList.html#GUPnPWhiteList.synopsis">
+<ANCHOR id="GUPnPWhiteList.object-hierarchy" href="gupnp/GUPnPWhiteList.html#GUPnPWhiteList.object-hierarchy">
+<ANCHOR id="GUPnPWhiteList.description" href="gupnp/GUPnPWhiteList.html#GUPnPWhiteList.description">
+<ANCHOR id="GUPnPWhiteList.details" href="gupnp/GUPnPWhiteList.html#GUPnPWhiteList.details">
+<ANCHOR id="GUPnPWhiteList-struct" href="gupnp/GUPnPWhiteList.html#GUPnPWhiteList-struct">
+<ANCHOR id="gupnp-white-list-add-entry" href="gupnp/GUPnPWhiteList.html#gupnp-white-list-add-entry">
+<ANCHOR id="gupnp-white-list-check-context" href="gupnp/GUPnPWhiteList.html#gupnp-white-list-check-context">
+<ANCHOR id="gupnp-white-list-clear" href="gupnp/GUPnPWhiteList.html#gupnp-white-list-clear">
+<ANCHOR id="gupnp-white-list-set-enabled" href="gupnp/GUPnPWhiteList.html#gupnp-white-list-set-enabled">
+<ANCHOR id="gupnp-white-list-get-entries" href="gupnp/GUPnPWhiteList.html#gupnp-white-list-get-entries">
+<ANCHOR id="gupnp-white-list-is-empty" href="gupnp/GUPnPWhiteList.html#gupnp-white-list-is-empty">
+<ANCHOR id="gupnp-white-list-get-enabled" href="gupnp/GUPnPWhiteList.html#gupnp-white-list-get-enabled">
+<ANCHOR id="gupnp-white-list-new" href="gupnp/GUPnPWhiteList.html#gupnp-white-list-new">
+<ANCHOR id="gupnp-white-list-remove-entry" href="gupnp/GUPnPWhiteList.html#gupnp-white-list-remove-entry">
 <ANCHOR id="GUPnPResourceFactory" href="gupnp/GUPnPResourceFactory.html">
 <ANCHOR id="GUPnPResourceFactory.synopsis" href="gupnp/GUPnPResourceFactory.html#GUPnPResourceFactory.synopsis">
 <ANCHOR id="GUPnPResourceFactory.object-hierarchy" href="gupnp/GUPnPResourceFactory.html#GUPnPResourceFactory.object-hierarchy">
@@ -298,6 +325,7 @@
 <ANCHOR id="GUPNP-XML-ERROR-PARSE:CAPS" href="gupnp/gupnp-Error-codes.html#GUPNP-XML-ERROR-PARSE:CAPS">
 <ANCHOR id="GUPNP-XML-ERROR-NO-NODE:CAPS" href="gupnp/gupnp-Error-codes.html#GUPNP-XML-ERROR-NO-NODE:CAPS">
 <ANCHOR id="GUPNP-XML-ERROR-EMPTY-NODE:CAPS" href="gupnp/gupnp-Error-codes.html#GUPNP-XML-ERROR-EMPTY-NODE:CAPS">
+<ANCHOR id="GUPNP-XML-ERROR-INVALID-ATTRIBUTE:CAPS" href="gupnp/gupnp-Error-codes.html#GUPNP-XML-ERROR-INVALID-ATTRIBUTE:CAPS">
 <ANCHOR id="GUPNP-XML-ERROR-OTHER:CAPS" href="gupnp/gupnp-Error-codes.html#GUPNP-XML-ERROR-OTHER:CAPS">
 <ANCHOR id="gupnp-Special-UPnP-types" href="gupnp/gupnp-Special-UPnP-types.html">
 <ANCHOR id="gupnp-Special-UPnP-types.synopsis" href="gupnp/gupnp-Special-UPnP-types.html#gupnp-Special-UPnP-types.synopsis">
@@ -317,6 +345,8 @@
 <ANCHOR id="annotation-glossterm-scope async" href="gupnp/annotation-glossary.html#annotation-glossterm-scope async">
 <ANCHOR id="annotation-glossterm-allow-none" href="gupnp/annotation-glossary.html#annotation-glossterm-allow-none">
 <ANCHOR id="annotation-glossterm-inout" href="gupnp/annotation-glossary.html#annotation-glossterm-inout">
-<ANCHOR id="annotation-glossterm-element-type" href="gupnp/annotation-glossary.html#annotation-glossterm-element-type">
-<ANCHOR id="annotation-glossterm-transfer full" href="gupnp/annotation-glossary.html#annotation-glossterm-transfer full">
 <ANCHOR id="annotation-glossterm-transfer none" href="gupnp/annotation-glossary.html#annotation-glossterm-transfer none">
+<ANCHOR id="annotation-glossterm-element-type" href="gupnp/annotation-glossary.html#annotation-glossterm-element-type">
+<ANCHOR id="annotation-glossterm-scope call" href="gupnp/annotation-glossary.html#annotation-glossterm-scope call">
+<ANCHOR id="annotation-glossterm-transfer full" href="gupnp/annotation-glossary.html#annotation-glossterm-transfer full">
+<ANCHOR id="annotation-glossterm-type" href="gupnp/annotation-glossary.html#annotation-glossterm-type">

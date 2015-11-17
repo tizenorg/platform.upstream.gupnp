@@ -17,8 +17,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 /**
@@ -69,8 +69,36 @@ gupnp_resource_factory_init (GUPnPResourceFactory *factory)
 }
 
 static void
+gupnp_resource_factory_finalize (GObject *object)
+{
+        GUPnPResourceFactory *self;
+        GObjectClass *object_class;
+
+        self = GUPNP_RESOURCE_FACTORY (object);
+
+        if (self->priv->resource_type_hash) {
+                g_hash_table_destroy (self->priv->resource_type_hash);
+                self->priv->resource_type_hash = NULL;
+        }
+
+        if (self->priv->proxy_type_hash) {
+                g_hash_table_destroy (self->priv->proxy_type_hash);
+                self->priv->proxy_type_hash = NULL;
+        }
+
+        object_class = G_OBJECT_CLASS (gupnp_resource_factory_parent_class);
+        object_class->finalize (object);
+}
+
+static void
 gupnp_resource_factory_class_init (GUPnPResourceFactoryClass *klass)
 {
+        GObjectClass *object_class;
+
+        object_class = G_OBJECT_CLASS (klass);
+
+        object_class->finalize = gupnp_resource_factory_finalize;
+
         g_type_class_add_private (klass, sizeof (GUPnPResourceFactoryPrivate));
 }
 
@@ -92,7 +120,7 @@ gupnp_resource_factory_new (void)
  *
  * Get the default singleton #GUPnPResourceFactory object.
  *
- * Return value: A @GUPnPResourceFactory object.
+ * Returns: (transfer none): A @GUPnPResourceFactory object.
  **/
 GUPnPResourceFactory *
 gupnp_resource_factory_get_default (void)

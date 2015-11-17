@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #ifndef __GUPNP_DEVICE_INFO_H__
@@ -57,6 +57,8 @@ gupnp_device_info_get_type (void) G_GNUC_CONST;
                  GUPnPDeviceInfoClass))
 
 typedef struct _GUPnPDeviceInfoPrivate GUPnPDeviceInfoPrivate;
+typedef struct _GUPnPDeviceInfo GUPnPDeviceInfo;
+typedef struct _GUPnPDeviceInfoClass GUPnPDeviceInfoClass;
 
 /**
  * GUPnPDeviceInfo:
@@ -64,28 +66,32 @@ typedef struct _GUPnPDeviceInfoPrivate GUPnPDeviceInfoPrivate;
  * This struct contains private data only, and should be accessed using the
  * functions below.
  */
-typedef struct {
+struct _GUPnPDeviceInfo {
         GObject parent;
 
         GUPnPDeviceInfoPrivate *priv;
-} GUPnPDeviceInfo;
+};
 
-typedef struct {
+struct _GUPnPDeviceInfoClass {
         GObjectClass parent_class;
 
         /* vtable */
         xmlNode          * (* get_element) (GUPnPDeviceInfo *info);
+
+        /* FIXME: Once we can break API/ABI, clean-up and rename the
+         * _get_device/_get_service functions */
+#ifndef GOBJECT_INTROSPECTION_SKIP
         GUPnPDeviceInfo  * (* get_device)  (GUPnPDeviceInfo *info,
                                             xmlNode         *element);
         GUPnPServiceInfo * (* get_service) (GUPnPDeviceInfo *info,
                                             xmlNode         *element);
-
+#endif
         /* future padding */
         void (* _gupnp_reserved1) (void);
         void (* _gupnp_reserved2) (void);
         void (* _gupnp_reserved3) (void);
         void (* _gupnp_reserved4) (void);
-} GUPnPDeviceInfoClass;
+};
 
 
 GUPnPContext *
@@ -144,6 +150,9 @@ gupnp_device_info_get_icon_url           (GUPnPDeviceInfo *info,
 
 char *
 gupnp_device_info_get_presentation_url   (GUPnPDeviceInfo *info);
+
+GList *
+gupnp_device_info_list_dlna_device_class_identifier (GUPnPDeviceInfo *info);
 
 GList *
 gupnp_device_info_list_dlna_capabilities (GUPnPDeviceInfo *info);

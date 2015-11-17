@@ -43,6 +43,7 @@ gupnp_device_info_get_presentation_url
 gupnp_device_info_get_upc
 gupnp_device_info_get_icon_url
 gupnp_device_info_list_dlna_capabilities
+gupnp_device_info_list_dlna_device_class_identifier
 gupnp_device_info_get_description_value
 gupnp_device_info_list_devices
 gupnp_device_info_list_device_types
@@ -119,6 +120,7 @@ gupnp_service_action_set_values
 gupnp_service_action_return
 gupnp_service_action_return_error
 gupnp_service_action_get_message
+gupnp_service_action_get_argument_count
 gupnp_service_notify
 gupnp_service_notify_valist
 gupnp_service_notify_value
@@ -135,6 +137,7 @@ GUPNP_SERVICE_CLASS
 GUPNP_IS_SERVICE_CLASS
 GUPNP_SERVICE_GET_CLASS
 GUPNP_TYPE_SERVICE_ACTION
+gupnp_service_action_get_type
 <SUBSECTION Private>
 GUPnPServicePrivate
 </SECTION>
@@ -150,6 +153,7 @@ gupnp_root_device_get_available
 gupnp_root_device_get_relative_location
 gupnp_root_device_get_description_dir
 gupnp_root_device_get_description_path
+gupnp_root_device_get_ssdp_resource_group
 <SUBSECTION Standard>
 GUPnPRootDeviceClass
 GUPNP_ROOT_DEVICE
@@ -174,6 +178,8 @@ gupnp_context_get_server
 gupnp_context_get_session
 gupnp_context_set_subscription_timeout
 gupnp_context_get_subscription_timeout
+gupnp_context_get_default_language
+gupnp_context_set_default_language
 gupnp_context_host_path
 gupnp_context_host_path_for_agent
 gupnp_context_unhost_path
@@ -195,8 +201,12 @@ GUPnPContextPrivate
 <TITLE>GUPnPContextManager</TITLE>
 GUPnPContextManager
 gupnp_context_manager_new
+gupnp_context_manager_create
+gupnp_context_manager_rescan_control_points
 gupnp_context_manager_manage_control_point
 gupnp_context_manager_manage_root_device
+gupnp_context_manager_get_port
+gupnp_context_manager_get_white_list
 <SUBSECTION Standard>
 GUPnPContextManagerClass
 GUPNP_CONTEXT_MANAGER
@@ -380,4 +390,84 @@ gupnp_server_error_quark
 gupnp_eventing_error_quark
 gupnp_control_error_quark
 gupnp_xml_error_quark
+</SECTION>
+
+<SECTION>
+<FILE>gupnp-connman-manager</FILE>
+<SUBSECTION Private>
+GUPNP_CONNMAN_MANAGER
+GUPNP_CONNMAN_MANAGER_CLASS
+GUPNP_CONNMAN_MANAGER_GET_CLASS
+GUPNP_IS_CONNMAN_MANAGER
+GUPNP_IS_CONNMAN_MANAGER_CLASS
+GUPNP_TYPE_CONNMAN_MANAGER
+GUPnPConnmanManager
+GUPnPConnmanManagerClass
+GUPnPConnmanManagerPrivate
+</SECTION>
+
+<SECTION>
+<FILE>gupnp-simple-context-manager</FILE>
+<SUBSECTION Private>
+GUPNP_IS_SIMPLE_CONTEXT_MANAGER
+GUPNP_IS_SIMPLE_CONTEXT_MANAGER_CLASS
+GUPNP_SIMPLE_CONTEXT_MANAGER
+GUPNP_SIMPLE_CONTEXT_MANAGER_CLASS
+GUPNP_SIMPLE_CONTEXT_MANAGER_GET_CLASS
+GUPNP_TYPE_SIMPLE_CONTEXT_MANAGER
+GUPnPSimpleContextManager
+GUPnPSimpleContextManagerClass
+GUPnPSimpleContextManagerPrivate
+</SECTION>
+
+<SECTION>
+<FILE>gupnp-windows-context-manager</FILE>
+<SUBSECTION Private>
+GUPNP_IS_WINDOWS_CONTEXT_MANAGER
+GUPNP_IS_WINDOWS_CONTEXT_MANAGER_CLASS
+GUPNP_TYPE_WINDOWS_CONTEXT_MANAGER
+GUPNP_WINDOWS_CONTEXT_MANAGER
+GUPNP_WINDOWS_CONTEXT_MANAGER_CLASS
+GUPNP_WINDOWS_CONTEXT_MANAGER_GET_CLASS
+GUPnPWindowsContextManager
+GUPnPWindowsContextManagerClass
+gupnp_windows_context_manager_get_type
+</SECTION>
+
+<SECTION>
+<FILE>gupnp-unix-context-manager</FILE>
+</SECTION>
+
+<SECTION>
+<FILE>gupnp-linux-context-manager</FILE>
+</SECTION>
+
+<SECTION>
+<FILE>gupnp-network-manager</FILE>
+</SECTION>
+
+<SECTION>
+<FILE>gupnp-white-list</FILE>
+<TITLE>GUPnPWhiteList</TITLE>
+GUPnPWhiteList
+gupnp_white_list_add_entry
+gupnp_white_list_check_context
+gupnp_white_list_clear
+gupnp_white_list_set_enabled
+gupnp_white_list_get_entries
+gupnp_white_list_is_empty
+gupnp_white_list_get_enabled
+gupnp_white_list_new
+gupnp_white_list_remove_entry
+<SUBSECTION Standard>
+gupnp_white_list_get_type
+GUPNP_IS_WHITE_LIST
+GUPNP_IS_WHITE_LIST_CLASS
+GUPNP_TYPE_WHITE_LIST
+GUPNP_WHITE_LIST
+GUPNP_WHITE_LIST_CLASS
+GUPNP_WHITE_LIST_GET_CLASS
+GUPnPWhiteListClass
+<SUBSECTION Private>
+GUPnPWhiteListPrivate
 </SECTION>

@@ -17,8 +17,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #ifndef __GUPNP_RESOURCE_FACTORY_H__
@@ -53,6 +53,8 @@ gupnp_resource_factory_get_type (void) G_GNUC_CONST;
                  GUPnPResourceFactoryClass))
 
 typedef struct _GUPnPResourceFactoryPrivate GUPnPResourceFactoryPrivate;
+typedef struct _GUPnPResourceFactory GUPnPResourceFactory;
+typedef struct _GUPnPResourceFactoryClass GUPnPResourceFactoryClass;
 
 /**
  * GUPnPResourceFactory:
@@ -60,13 +62,13 @@ typedef struct _GUPnPResourceFactoryPrivate GUPnPResourceFactoryPrivate;
  * This struct contains private data only, and should be accessed using the
  * functions below.
  */
-typedef struct {
+struct _GUPnPResourceFactory {
         GObject parent;
 
         GUPnPResourceFactoryPrivate *priv;
-} GUPnPResourceFactory;
+};
 
-typedef struct {
+struct _GUPnPResourceFactoryClass {
         GObjectClass parent_class;
 
         /* future padding */
@@ -74,7 +76,7 @@ typedef struct {
         void (* _gupnp_reserved2) (void);
         void (* _gupnp_reserved3) (void);
         void (* _gupnp_reserved4) (void);
-} GUPnPResourceFactoryClass;
+};
 
 GUPnPResourceFactory *
 gupnp_resource_factory_new         (void);

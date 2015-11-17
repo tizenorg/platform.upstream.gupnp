@@ -3,12 +3,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>GUPnPControlPoint</title>
-<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
 <link rel="home" href="index.html" title="GUPnP Reference Manual">
 <link rel="up" href="api-device-control.html" title="Device Control">
 <link rel="prev" href="api-device-control.html" title="Device Control">
 <link rel="next" href="GUPnPDeviceProxy.html" title="GUPnPDeviceProxy">
-<meta name="generator" content="GTK-Doc V1.15.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.18 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -43,7 +43,7 @@
 </tr></table></div>
 <div class="refsynopsisdiv">
 <a name="GUPnPControlPoint.synopsis"></a><h2>Synopsis</h2>
-<pre class="synopsis">                    <a class="link" href="GUPnPControlPoint.html#GUPnPControlPoint-struct" title="GUPnPControlPoint">GUPnPControlPoint</a>;
+<pre class="synopsis">struct              <a class="link" href="GUPnPControlPoint.html#GUPnPControlPoint-struct" title="struct GUPnPControlPoint">GUPnPControlPoint</a>;
 <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="returnvalue">GUPnPControlPoint</span></a> * <a class="link" href="GUPnPControlPoint.html#gupnp-control-point-new" title="gupnp_control_point_new ()">gupnp_control_point_new</a>             (<em class="parameter"><code><a class="link" href="GUPnPContext.html" title="GUPnPContext"><span class="type">GUPnPContext</span></a> *context</code></em>,
                                                          <em class="parameter"><code>const <span class="type">char</span> *target</code></em>);
 <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="returnvalue">GUPnPControlPoint</span></a> * <a class="link" href="GUPnPControlPoint.html#gupnp-control-point-new-full" title="gupnp_control_point_new_full ()">gupnp_control_point_new_full</a>        (<em class="parameter"><code><a class="link" href="GUPnPContext.html" title="GUPnPContext"><span class="type">GUPnPContext</span></a> *context</code></em>,
@@ -62,7 +62,7 @@ const <a href="http://library.gnome.org/devel/glib/unstable/glib-Doubly-Linked-L
 <a name="GUPnPControlPoint.object-hierarchy"></a><h2>Object Hierarchy</h2>
 <pre class="synopsis">
   <a href="http://library.gnome.org/devel/gobject/unstable/gobject-The-Base-Object-Type.html#GObject">GObject</a>
-   +----<a href="/opt/gnome2/share/gtk-doc/html/gssdp/GSSDPResourceBrowser.html">GSSDPResourceBrowser</a>
+   +----<a href="../gssdp/GSSDPResourceBrowser.html">GSSDPResourceBrowser</a>
          +----GUPnPControlPoint
 </pre>
 </div>
@@ -85,25 +85,21 @@ const <a href="http://library.gnome.org/devel/glib/unstable/glib-Doubly-Linked-L
 <a name="GUPnPControlPoint.description"></a><h2>Description</h2>
 <p>
 <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="type">GUPnPControlPoint</span></a> handles device and service discovery. After creating
-a control point and activating it using <a href="/opt/gnome2/share/gtk-doc/html/gssdp/GSSDPResourceBrowser.html#gssdp-resource-browser-set-active"><code class="function">gssdp_resource_browser_set_active()</code></a>,
+a control point and activating it using <a href="../gssdp/GSSDPResourceBrowser.html#gssdp-resource-browser-set-active"><code class="function">gssdp_resource_browser_set_active()</code></a>,
 the ::device-proxy-available, ::service-proxy-available,
 ::device-proxy-unavailable and ::service-proxy-unavailable signals will
 be emitted whenever the availability of a device or service matching
 the specified discovery target changes.
 </p>
-<p>
-</p>
 </div>
 <div class="refsect1">
 <a name="GUPnPControlPoint.details"></a><h2>Details</h2>
 <div class="refsect2">
-<a name="GUPnPControlPoint-struct"></a><h3>GUPnPControlPoint</h3>
-<pre class="programlisting">typedef struct _GUPnPControlPoint GUPnPControlPoint;</pre>
+<a name="GUPnPControlPoint-struct"></a><h3>struct GUPnPControlPoint</h3>
+<pre class="programlisting">struct GUPnPControlPoint;</pre>
 <p>
 This struct contains private data only, and should be accessed using the
 functions below.
-</p>
-<p>
 </p>
 </div>
 <hr>
@@ -119,8 +115,6 @@ Create a new <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPo
 <code class="literal">urn:schemas-upnp-org:service:WANIPConnection:1</code> or
 <code class="literal">urn:schemas-upnp-org:device:MediaRenderer:1</code>.
 </p>
-<p>
-</p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody>
@@ -131,13 +125,11 @@ Create a new <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPo
 </tr>
 <tr>
 <td><p><span class="term"><em class="parameter"><code>target</code></em> :</span></p></td>
-<td>The search target
-</td>
+<td>The search target</td>
 </tr>
 <tr>
 <td><p><span class="term"><span class="emphasis"><em>Returns</em></span> :</span></p></td>
-<td> A new <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="type">GUPnPControlPoint</span></a> object.
-</td>
+<td>A new <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="type">GUPnPControlPoint</span></a> object.</td>
 </tr>
 </tbody>
 </table></div>
@@ -157,8 +149,6 @@ Create a new <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPo
 <code class="literal">urn:schemas-upnp-org:service:WANIPConnection:1</code> or
 <code class="literal">urn:schemas-upnp-org:device:MediaRenderer:1</code>.
 </p>
-<p>
-</p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody>
@@ -174,13 +164,11 @@ Create a new <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPo
 </tr>
 <tr>
 <td><p><span class="term"><em class="parameter"><code>target</code></em> :</span></p></td>
-<td>The search target
-</td>
+<td>The search target</td>
 </tr>
 <tr>
 <td><p><span class="term"><span class="emphasis"><em>Returns</em></span> :</span></p></td>
-<td> A new <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="type">GUPnPControlPoint</span></a> object.
-</td>
+<td>A new <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="type">GUPnPControlPoint</span></a> object.</td>
 </tr>
 </tbody>
 </table></div>
@@ -193,8 +181,6 @@ Create a new <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPo
 <p>
 Get the <a class="link" href="GUPnPResourceFactory.html" title="GUPnPResourceFactory"><span class="type">GUPnPResourceFactory</span></a> used by the <em class="parameter"><code>control_point</code></em>.
 </p>
-<p>
-</p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody>
@@ -205,7 +191,7 @@ Get the <a class="link" href="GUPnPResourceFactory.html" title="GUPnPResourceFac
 </tr>
 <tr>
 <td><p><span class="term"><span class="emphasis"><em>Returns</em></span> :</span></p></td>
-<td> A <a class="link" href="GUPnPResourceFactory.html" title="GUPnPResourceFactory"><span class="type">GUPnPResourceFactory</span></a>.
+<td>A <a class="link" href="GUPnPResourceFactory.html" title="GUPnPResourceFactory"><span class="type">GUPnPResourceFactory</span></a>. <span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span>
 </td>
 </tr>
 </tbody>
@@ -218,8 +204,6 @@ Get the <a class="link" href="GUPnPResourceFactory.html" title="GUPnPResourceFac
 <p>
 Get the <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="type">GUPnPControlPoint</span></a> associated with <em class="parameter"><code>control_point</code></em>.
 </p>
-<p>
-</p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody>
@@ -230,7 +214,7 @@ Get the <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint">
 </tr>
 <tr>
 <td><p><span class="term"><span class="emphasis"><em>Returns</em></span> :</span></p></td>
-<td> The <a class="link" href="GUPnPContext.html" title="GUPnPContext"><span class="type">GUPnPContext</span></a>.
+<td>The <a class="link" href="GUPnPContext.html" title="GUPnPContext"><span class="type">GUPnPContext</span></a>. <span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span>
 </td>
 </tr>
 </tbody>
@@ -245,8 +229,6 @@ Get the <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint">
 Get the <a href="http://library.gnome.org/devel/glib/unstable/glib-Doubly-Linked-Lists.html#GList"><span class="type">GList</span></a> of discovered <a class="link" href="GUPnPDeviceProxy.html" title="GUPnPDeviceProxy"><span class="type">GUPnPDeviceProxy</span></a> objects. Do not free the list
 nor its elements.
 </p>
-<p>
-</p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody>
@@ -257,7 +239,7 @@ nor its elements.
 </tr>
 <tr>
 <td><p><span class="term"><span class="emphasis"><em>Returns</em></span> :</span></p></td>
-<td>  a <a href="http://library.gnome.org/devel/glib/unstable/glib-Doubly-Linked-Lists.html#GList"><span class="type">GList</span></a> of
+<td>a <a href="http://library.gnome.org/devel/glib/unstable/glib-Doubly-Linked-Lists.html#GList"><span class="type">GList</span></a> of
 <a class="link" href="GUPnPDeviceProxy.html" title="GUPnPDeviceProxy"><span class="type">GUPnPDeviceProxy</span></a> objects. <span class="annotation">[<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> GUPnP.DeviceProxy][<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span>
 </td>
 </tr>
@@ -273,8 +255,6 @@ nor its elements.
 Get the <a href="http://library.gnome.org/devel/glib/unstable/glib-Doubly-Linked-Lists.html#GList"><span class="type">GList</span></a> of discovered <a class="link" href="GUPnPServiceProxy.html" title="GUPnPServiceProxy"><span class="type">GUPnPServiceProxy</span></a> objects. Do not free the
 list nor its elements.
 </p>
-<p>
-</p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody>
@@ -285,8 +265,8 @@ list nor its elements.
 </tr>
 <tr>
 <td><p><span class="term"><span class="emphasis"><em>Returns</em></span> :</span></p></td>
-<td> a <a href="http://library.gnome.org/devel/glib/unstable/glib-Doubly-Linked-Lists.html#GList"><span class="type">GList</span></a>
-of <a class="link" href="GUPnPServiceProxy.html" title="GUPnPServiceProxy"><span class="type">GUPnPServiceProxy</span></a> objects. <span class="annotation">[<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym>][<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span>
+<td>a <a href="http://library.gnome.org/devel/glib/unstable/glib-Doubly-Linked-Lists.html#GList"><span class="type">GList</span></a>
+of <a class="link" href="GUPnPServiceProxy.html" title="GUPnPServiceProxy"><span class="type">GUPnPServiceProxy</span></a> objects. <span class="annotation">[<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> GUPnP.ServiceProxy][<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span>
 </td>
 </tr>
 </tbody>
@@ -301,8 +281,6 @@ of <a class="link" href="GUPnPServiceProxy.html" title="GUPnPServiceProxy"><span
 <p>
 The resource factory to use. Set to NULL for default factory.
 </p>
-<p>
-</p>
 </div>
 </div>
 <div class="refsect1">
@@ -316,15 +294,12 @@ The resource factory to use. Set to NULL for default factory.
 The ::device-proxy-available signal is emitted whenever a new
 device has become available.
 </p>
-<p>
-</p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody>
 <tr>
 <td><p><span class="term"><em class="parameter"><code>control_point</code></em> :</span></p></td>
-<td>The <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="type">GUPnPControlPoint</span></a> that received the signal
-</td>
+<td>The <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="type">GUPnPControlPoint</span></a> that received the signal</td>
 </tr>
 <tr>
 <td><p><span class="term"><em class="parameter"><code>proxy</code></em> :</span></p></td>
@@ -348,15 +323,12 @@ device has become available.
 The ::device-proxy-unavailable signal is emitted whenever a
 device is not available any more.
 </p>
-<p>
-</p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody>
 <tr>
 <td><p><span class="term"><em class="parameter"><code>control_point</code></em> :</span></p></td>
-<td>The <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="type">GUPnPControlPoint</span></a> that received the signal
-</td>
+<td>The <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="type">GUPnPControlPoint</span></a> that received the signal</td>
 </tr>
 <tr>
 <td><p><span class="term"><em class="parameter"><code>proxy</code></em> :</span></p></td>
@@ -380,15 +352,12 @@ device is not available any more.
 The ::service-proxy-available signal is emitted whenever a new
 service has become available.
 </p>
-<p>
-</p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody>
 <tr>
 <td><p><span class="term"><em class="parameter"><code>control_point</code></em> :</span></p></td>
-<td>The <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="type">GUPnPControlPoint</span></a> that received the signal
-</td>
+<td>The <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="type">GUPnPControlPoint</span></a> that received the signal</td>
 </tr>
 <tr>
 <td><p><span class="term"><em class="parameter"><code>proxy</code></em> :</span></p></td>
@@ -412,15 +381,12 @@ service has become available.
 The ::service-proxy-unavailable signal is emitted whenever a
 service is not available any more.
 </p>
-<p>
-</p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody>
 <tr>
 <td><p><span class="term"><em class="parameter"><code>control_point</code></em> :</span></p></td>
-<td>The <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="type">GUPnPControlPoint</span></a> that received the signal
-</td>
+<td>The <a class="link" href="GUPnPControlPoint.html" title="GUPnPControlPoint"><span class="type">GUPnPControlPoint</span></a> that received the signal</td>
 </tr>
 <tr>
 <td><p><span class="term"><em class="parameter"><code>proxy</code></em> :</span></p></td>
@@ -438,6 +404,6 @@ service is not available any more.
 </div>
 <div class="footer">
 <hr>
-          Generated by GTK-Doc V1.15.1</div>
+          Generated by GTK-Doc V1.18</div>
 </body>
 </html>

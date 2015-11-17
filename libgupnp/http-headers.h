@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #ifndef __HTTP_HEADERS_H__
@@ -53,6 +53,11 @@ http_response_set_content_range  (SoupMessage  *message,
                                   gsize         offset,
                                   gsize         length,
                                   gsize         total);
+
+G_GNUC_INTERNAL void
+http_response_set_body_gzip      (SoupMessage   *msg,
+                                  const char    *body,
+                                  const gsize    length);
 
 G_END_DECLS
 

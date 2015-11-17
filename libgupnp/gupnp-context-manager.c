@@ -1,9 +1,11 @@
 /*
- * Copyright (C) 2009 Nokia Corporation, all rights reserved.
+ * Copyright (C) 2009 Nokia Corporation.
  * Copyright (C) 2006, 2007, 2008 OpenedHand Ltd.
+ * Copyright (C) 2013 Intel Corporation.
  *
  * Author: Zeeshan Ali (Khattak) <zeeshanak@gnome.org>
  *         Jorn Baayen <jorn@openedhand.com>
+ *         Ludovic Ferrandis <ludovic.ferrandis@intel.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,8 +19,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 /**
@@ -37,6 +39,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <libsoup/soup-address.h>
+#include <glib.h>
 #include <glib/gstdio.h>
 
 #include "gupnp.h"
@@ -44,25 +47,26 @@
 
 #include "gupnp-unix-context-manager.h"
 
-G_DEFINE_TYPE (GUPnPContextManager,
-               gupnp_context_manager,
-               G_TYPE_OBJECT);
+G_DEFINE_ABSTRACT_TYPE (GUPnPContextManager,
+                        gupnp_context_manager,
+                        G_TYPE_OBJECT);
 
 struct _GUPnPContextManagerPrivate {
-        GMainContext      *main_context;
-
         guint              port;
 
         GUPnPContextManager *impl;
 
         GList *objects; /* control points and root devices */
+        GList *blacklisted; /* Blacklisted Context */
+
+        GUPnPWhiteList *white_list;
 };
 
 enum {
         PROP_0,
         PROP_MAIN_CONTEXT,
         PROP_PORT,
-        PROP_CONTEXT_MANAGER
+        PROP_WHITE_LIST
 };
 
 enum {
@@ -74,28 +78,40 @@ enum {
 static guint signals[SIGNAL_LAST];
 
 static void
-on_context_available (GUPnPContextManager *impl,
-                      GUPnPContext        *context,
-                      gpointer            *user_data)
+on_context_available (GUPnPContextManager    *manager,
+                      GUPnPContext           *context,
+                      G_GNUC_UNUSED gpointer *user_data)
 {
-        GUPnPContextManager *manager = GUPNP_CONTEXT_MANAGER (user_data);
+        GUPnPWhiteList *white_list;
 
-        /* Just proxy the signal */
-        g_signal_emit (manager,
-                       signals[CONTEXT_AVAILABLE],
-                       0,
-                       context);
+        white_list = manager->priv->white_list;
+
+        /* Try to catch the notification, only if the white list
+         * is enabled, not empty and the context doesn't match */
+        if (!gupnp_white_list_is_empty (white_list) &&
+            gupnp_white_list_get_enabled (white_list) &&
+            !gupnp_white_list_check_context (white_list, context)) {
+                /* If the conext doesn't match, block the notification
+                 * and disable the context */
+                g_signal_stop_emission_by_name (manager, "context-available");
+
+                /* Make sure we don't send anything on now blocked network */
+                g_object_set (context, "active", FALSE, NULL);
+
+                /* Save it in case we need to re-enable it */
+                manager->priv->blacklisted = g_list_prepend (
+                                                manager->priv->blacklisted,
+                                                g_object_ref (context));
+        }
 }
 
 static void
-on_context_unavailable (GUPnPContextManager *impl,
-                        GUPnPContext        *context,
-                        gpointer            *user_data)
+on_context_unavailable (GUPnPContextManager    *manager,
+                        GUPnPContext           *context,
+                        G_GNUC_UNUSED gpointer *user_data)
 {
-        GUPnPContextManager *manager;
         GList *l;
-
-        manager = GUPNP_CONTEXT_MANAGER (user_data);
+        GList *black;
 
         /* Make sure we don't send anything on now unavailable network */
         g_object_set (context, "active", FALSE, NULL);
@@ -133,11 +149,118 @@ on_context_unavailable (GUPnPContextManager *impl,
                 }
         }
 
-        /* Just proxy the signal */
-        g_signal_emit (manager,
-                       signals[CONTEXT_UNAVAILABLE],
-                       0,
-                       context);
+        black = g_list_find (manager->priv->blacklisted, context);
+
+        if (black != NULL) {
+                g_signal_stop_emission_by_name (manager, "context-unavailable");
+
+                g_object_unref (black->data);
+                manager->priv->blacklisted =
+                        g_list_delete_link (manager->priv->blacklisted, black);
+        }
+}
+
+static void
+gupnp_context_manager_filter_context (GUPnPWhiteList *white_list,
+                                      GUPnPContextManager *manager,
+                                      gboolean check)
+{
+        GList *next;
+        GList *obj;
+        GList *blk;
+        gboolean match;
+        GUPnPContext *context;
+        GSSDPResourceBrowser *browser;
+
+        obj = manager->priv->objects;
+        blk = manager->priv->blacklisted;
+
+        while (obj != NULL) {
+                if (!GUPNP_IS_CONTROL_POINT (obj->data))
+                        continue;
+
+                /* If the white list is empty, treat it as disabled */
+                if (check) {
+                        /* Filter out context */
+                        context = gupnp_control_point_get_context (obj->data);
+                        match = gupnp_white_list_check_context (white_list,
+                                                                context);
+                } else {
+                        /* Re-activate all context, if needed */
+                        match = TRUE;
+                }
+
+                browser = GSSDP_RESOURCE_BROWSER (obj->data);
+                gssdp_resource_browser_set_active (browser, match);
+
+                if (match)
+                        (void) gssdp_resource_browser_rescan (browser);
+
+                obj = obj->next;
+        }
+
+        while (blk != NULL) {
+                /* If the white list is empty, treat it as disabled */
+                if (check)
+                        /* Filter out context */
+                        match = gupnp_white_list_check_context (white_list,
+                                                                blk->data);
+                else
+                        /* Re-activate all context, if needed */
+                        match = TRUE;
+
+                if (!match) {
+                        blk = blk->next;
+                        continue;
+                }
+
+                next = blk->next;
+                g_object_set (blk->data, "active", TRUE, NULL);
+
+                g_signal_emit_by_name (manager, "context-available", blk->data);
+
+                g_object_unref (blk->data);
+                manager->priv->blacklisted = g_list_delete_link (
+                                                manager->priv->blacklisted,
+                                                blk);
+                blk = next;
+        }
+}
+
+static void
+on_white_list_change_cb (GUPnPWhiteList *white_list,
+                         GParamSpec *pspec,
+                         gpointer user_data)
+{
+        GUPnPContextManager *manager = GUPNP_CONTEXT_MANAGER (user_data);
+        gboolean enabled;
+        gboolean is_empty;
+
+        enabled = gupnp_white_list_get_enabled (white_list);
+        is_empty = gupnp_white_list_is_empty (white_list);
+
+        if (enabled)
+                gupnp_context_manager_filter_context (white_list,
+                                                      manager,
+                                                      !is_empty);
+}
+
+static void
+on_white_list_enabled_cb (GUPnPWhiteList *white_list,
+                          GParamSpec *pspec,
+                          gpointer user_data)
+{
+        GUPnPContextManager *manager = GUPNP_CONTEXT_MANAGER (user_data);
+        gboolean enabled;
+        gboolean is_empty;
+
+        enabled = gupnp_white_list_get_enabled (white_list);
+        is_empty = gupnp_white_list_is_empty (white_list);
+
+        if (!is_empty)
+                gupnp_context_manager_filter_context (white_list,
+                                                      manager,
+                                                      enabled);
 }
 
 static void
@@ -147,6 +270,14 @@ gupnp_context_manager_init (GUPnPContextManager *manager)
                 G_TYPE_INSTANCE_GET_PRIVATE (manager,
                                              GUPNP_TYPE_CONTEXT_MANAGER,
                                              GUPnPContextManagerPrivate);
+
+        manager->priv->white_list = gupnp_white_list_new ();
+
+        g_signal_connect_after (manager->priv->white_list, "notify::entries",
+                                G_CALLBACK (on_white_list_change_cb), manager);
+
+        g_signal_connect_after (manager->priv->white_list, "notify::enabled",
+                                G_CALLBACK (on_white_list_enabled_cb), manager);
 }
 
 static void
@@ -166,22 +297,11 @@ gupnp_context_manager_set_property (GObject      *object,
                 priv->port = g_value_get_uint (value);
                 break;
         case PROP_MAIN_CONTEXT:
-                priv->main_context = g_value_get_pointer (value);
-                break;
-        case PROP_CONTEXT_MANAGER:
-                priv->impl = g_value_get_object (value);
-                if (priv->impl != NULL) {
-                        priv->impl = g_object_ref (priv->impl);
-
-                        g_signal_connect (priv->impl,
-                                          "context-available",
-                                          G_CALLBACK (on_context_available),
-                                          manager);
-                        g_signal_connect (priv->impl,
-                                          "context-unavailable",
-                                          G_CALLBACK (on_context_unavailable),
-                                          manager);
-                }
+                if (g_value_get_pointer (value) != NULL)
+                        g_warning ("GUPnPContextManager:main-context is "
+                                   "deprecated. Use "
+                                   "g_main_context_push_thread_default()"
+                                   "instead.");
                 break;
         default:
                 G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -204,10 +324,14 @@ gupnp_context_manager_get_property (GObject    *object,
                 g_value_set_uint (value, manager->priv->port);
                 break;
         case PROP_MAIN_CONTEXT:
-                g_value_set_pointer (value, manager->priv->main_context);
+                g_warning ("GUPnPContextManager:main-context is deprecated. "
+                           "Use g_main_context_push_thread_default()"
+                           "instead.");
+                g_value_set_pointer (value,
+                                     g_main_context_get_thread_default ());
                 break;
-        case PROP_CONTEXT_MANAGER:
-                g_value_set_object (value, manager->priv->impl);
+        case PROP_WHITE_LIST:
+                g_value_set_object (value, manager->priv->white_list);
                 break;
         default:
                 G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -219,22 +343,29 @@ static void
 gupnp_context_manager_dispose (GObject *object)
 {
         GUPnPContextManager *manager;
+        GUPnPWhiteList *wl;
         GObjectClass *object_class;
 
         manager = GUPNP_CONTEXT_MANAGER (object);
+        wl = manager->priv->white_list;
 
-        if (manager->priv->impl != NULL) {
-                g_signal_handlers_disconnect_by_func (manager->priv->impl,
-                    on_context_available, manager);
-                g_signal_handlers_disconnect_by_func (manager->priv->impl,
-                    on_context_unavailable, manager);
-                g_object_unref (manager->priv->impl);
-                manager->priv->impl = NULL;
-        }
+        g_signal_handlers_disconnect_by_func (wl,
+                                              on_white_list_enabled_cb,
+                                              manager);
 
-        g_list_foreach (manager->priv->objects, (GFunc) g_object_unref, NULL);
-        g_list_free (manager->priv->objects);
+        g_signal_handlers_disconnect_by_func (wl,
+                                              on_white_list_change_cb,
+                                              NULL);
+
+        g_list_free_full (manager->priv->objects, g_object_unref);
         manager->priv->objects = NULL;
+        g_list_free_full (manager->priv->blacklisted, g_object_unref);
+        manager->priv->blacklisted = NULL;
+
+        if (wl) {
+                g_object_unref (wl);
+                manager->priv->white_list = NULL;
+        }
 
         /* Call super */
         object_class = G_OBJECT_CLASS (gupnp_context_manager_parent_class);
@@ -259,6 +390,9 @@ gupnp_context_manager_class_init (GUPnPContextManagerClass *klass)
          *
          * The #GMainContext to pass to created #GUPnPContext objects. Set to
          * NULL to use the default.
+         *
+         * Deprecated: 0.17.2: Use g_main_context_push_thread_default()
+         *             instead.
          **/
         g_object_class_install_property
                 (object_class,
@@ -275,7 +409,7 @@ gupnp_context_manager_class_init (GUPnPContextManagerClass *klass)
         /**
          * GUPnPContextManager:port:
          *
-         * @port: Port to create contexts for, or 0 if you don't care what
+         * Port the contexts listen on, or 0 if you don't care what
          * port is used by #GUPnPContext objects created by this object.
          **/
         g_object_class_install_property
@@ -291,28 +425,24 @@ gupnp_context_manager_class_init (GUPnPContextManagerClass *klass)
                                     G_PARAM_STATIC_NICK |
                                     G_PARAM_STATIC_BLURB));
 
-        /**
-         * GUPnPContextManager:context-manager:
+         /**
+         * GUPnPContextManager:white-list:
          *
-         * The actual GUPnPContextManager implementation used. This is an
-         * internal property and therefore Application developer should just
-         * ignore it.
-         *
+         * The white list to use.
          **/
         g_object_class_install_property
                 (object_class,
-                 PROP_CONTEXT_MANAGER,
-                 g_param_spec_object ("context-manager",
-                                      "ContextManager",
-                                      "ContextManager implemention",
-                                      GUPNP_TYPE_CONTEXT_MANAGER,
-                                      G_PARAM_WRITABLE |
-                                      G_PARAM_CONSTRUCT_ONLY |
+                 PROP_WHITE_LIST,
+                 g_param_spec_object ("white-list",
+                                      "White List",
+                                      "The white list to use",
+                                      GUPNP_TYPE_WHITE_LIST,
+                                      G_PARAM_READABLE |
                                       G_PARAM_STATIC_NAME |
                                       G_PARAM_STATIC_NICK |
                                       G_PARAM_STATIC_BLURB));
 
-        /**
+       /**
          * GUPnPContextManager::context-available:
          * @context_manager: The #GUPnPContextManager that received the signal
          * @context: The now available #GUPnPContext
@@ -321,15 +451,15 @@ gupnp_context_manager_class_init (GUPnPContextManagerClass *klass)
          *
          **/
         signals[CONTEXT_AVAILABLE] =
-                g_signal_new ("context-available",
-                              GUPNP_TYPE_CONTEXT_MANAGER,
-                              G_SIGNAL_RUN_LAST,
-                              0,
-                              NULL, NULL,
-                              g_cclosure_marshal_VOID__OBJECT,
-                              G_TYPE_NONE,
-                              1,
-                              GUPNP_TYPE_CONTEXT);
+                g_signal_new_class_handler ("context-available",
+                                            GUPNP_TYPE_CONTEXT_MANAGER,
+                                            G_SIGNAL_RUN_FIRST,
+                                            G_CALLBACK (on_context_available),
+                                            NULL, NULL,
+                                            g_cclosure_marshal_VOID__OBJECT,
+                                            G_TYPE_NONE,
+                                            1,
+                                            GUPNP_TYPE_CONTEXT);
 
         /**
          * GUPnPContextManager::context-unavailable:
@@ -340,57 +470,135 @@ gupnp_context_manager_class_init (GUPnPContextManagerClass *klass)
          *
          **/
         signals[CONTEXT_UNAVAILABLE] =
-                g_signal_new ("context-unavailable",
-                              GUPNP_TYPE_CONTEXT_MANAGER,
-                              G_SIGNAL_RUN_LAST,
-                              0,
-                              NULL, NULL,
-                              g_cclosure_marshal_VOID__OBJECT,
-                              G_TYPE_NONE,
-                              1,
-                              GUPNP_TYPE_CONTEXT);
+                g_signal_new_class_handler
+                                        ("context-unavailable",
+                                         GUPNP_TYPE_CONTEXT_MANAGER,
+                                         G_SIGNAL_RUN_FIRST,
+                                         G_CALLBACK (on_context_unavailable),
+                                         NULL, NULL,
+                                         g_cclosure_marshal_VOID__OBJECT,
+                                         G_TYPE_NONE,
+                                         1,
+                                         GUPNP_TYPE_CONTEXT);
 }
 
 /**
  * gupnp_context_manager_new:
+ * @main_context: (allow-none): Deprecated: 0.17.2: %NULL. If you want to use
+ *                a different main context use
+ *                g_main_context_push_thread_default() instead.
  * @port: Port to create contexts for, or 0 if you don't care what port is used.
- * @main_context: GMainContext to pass to created GUPnPContext objects.
  *
- * Create a new #GUPnPContextManager.
+ * Same as gupnp_context_manager_create().
  *
- * Return value: A new #GUPnPContextManager object.
+ * Returns: (transfer full): A new #GUPnPContextManager object.
+ * Deprecated: 0.17.2: Use gupnp_context_manager_create().
  **/
 GUPnPContextManager *
 gupnp_context_manager_new (GMainContext *main_context,
                            guint         port)
 {
-        GUPnPContextManager *manager;
-        GUPnPContextManager *impl;
-        GType impl_type = G_TYPE_INVALID;
+    if (main_context)
+            g_warning ("gupnp_context_manager_new::main_context is"
+                       " deprecated. Use "
+                       " g_main_context_push_thread_default() instead");
 
-#ifdef USE_NETWORK_MANAGER
-#include "gupnp-network-manager.h"
+    return gupnp_context_manager_create (port);
+}
 
-        if (gupnp_network_manager_is_available (main_context))
-                impl_type = GUPNP_TYPE_NETWORK_MANAGER;
+#ifdef HAVE_LINUX_RTNETLINK_H
+#include "gupnp-linux-context-manager.h"
 #endif
 
-        if (impl_type == G_TYPE_INVALID)
-                impl_type = GUPNP_TYPE_UNIX_CONTEXT_MANAGER;
+/**
+ * gupnp_context_manager_create:
+ * @port: Port to create contexts for, or 0 if you don't care what port is used.
+ *
+ * Factory-method to create a new #GUPnPContextManager. The final type of the
+ * #GUPnPContextManager depends on the compile-time selection or - in case of
+ * NetworkManager - on its availability during runtime. If it is not available,
+ * the implementation falls back to the basic Unix context manager instead.
+ *
+ * Returns: (transfer full): A new #GUPnPContextManager object.
+ **/
+GUPnPContextManager *
+gupnp_context_manager_create (guint port)
+{
+#if defined(USE_NETWORK_MANAGER) || defined (USE_CONNMAN)
+        GDBusConnection *system_bus;
+#endif
+        GUPnPContextManager *impl;
+        GType impl_type = G_TYPE_INVALID;
+#ifdef G_OS_WIN32
+#include "gupnp-windows-context-manager.h"
 
+        impl_type = GUPNP_TYPE_WINDOWS_CONTEXT_MANAGER;
+#else
+#ifdef USE_NETWORK_MANAGER
+#include "gupnp-network-manager.h"
+        system_bus = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, NULL);
+
+        if (gupnp_network_manager_is_available ())
+                impl_type = GUPNP_TYPE_NETWORK_MANAGER;
+#elif USE_CONNMAN
+#include "gupnp-connman-manager.h"
+        system_bus = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, NULL);
+
+       if (gupnp_connman_manager_is_available ())
+                impl_type = GUPNP_TYPE_CONNMAN_MANAGER;
+#endif
+
+        if (impl_type == G_TYPE_INVALID) {
+            /* Either user requested us to use the Linux CM explicitly or we
+             * are using one of the DBus managers but it's not available, so we
+             * fall-back to it. */
+#if defined (USE_NETLINK) || defined (HAVE_LINUX_RTNETLINK_H)
+                if (gupnp_linux_context_manager_is_available ())
+                        impl_type = GUPNP_TYPE_LINUX_CONTEXT_MANAGER;
+                else
+                    impl_type = GUPNP_TYPE_UNIX_CONTEXT_MANAGER;
+#else
+                impl_type = GUPNP_TYPE_UNIX_CONTEXT_MANAGER;
+#endif
+        }
+#endif /* G_OS_WIN32 */
         impl = g_object_new (impl_type,
-                             "main-context", main_context,
                              "port", port,
                              NULL);
 
-        manager = g_object_new (GUPNP_TYPE_CONTEXT_MANAGER,
-                                "main-context", main_context,
-                                "port", port,
-                                "context-manager", impl,
-                                NULL);
-        g_object_unref (impl);
+#if defined(USE_NETWORK_MANAGER) || defined(USE_CONNMAN)
+        g_object_unref (system_bus);
+#endif
+        return impl;
+}
 
-        return manager;
+/**
+ * gupnp_context_manager_rescan_control_points:
+ * @manager: A #GUPnPContextManager
+ *
+ * This function starts a rescan on every control point managed by @manager.
+ * Only the active control points send discovery messages.
+ * This function should be called when servers are suspected to have
+ * disappeared.
+ **/
+void
+gupnp_context_manager_rescan_control_points (GUPnPContextManager *manager)
+{
+        GList *l;
+
+        g_return_if_fail (GUPNP_IS_CONTEXT_MANAGER (manager));
+
+        l = manager->priv->objects;
+
+        while (l) {
+                if (GUPNP_IS_CONTROL_POINT (l->data)) {
+                        GSSDPResourceBrowser *browser =
+                                GSSDP_RESOURCE_BROWSER (l->data);
+                        gssdp_resource_browser_rescan (browser);
+                }
+
+                l = l->next;
+        }
 }
 
 /**
@@ -437,3 +645,34 @@ gupnp_context_manager_manage_root_device (GUPnPContextManager *manager,
                                                 g_object_ref (root_device));
 }
 
+/**
+ * gupnp_context_manager_get_port:
+ * @manager: A #GUPnPContextManager
+ *
+ * Get the network port associated with this context manager.
+ * Returns: The network port asssociated with this context manager.
+ */
+guint
+gupnp_context_manager_get_port (GUPnPContextManager *manager)
+{
+        g_return_val_if_fail (GUPNP_IS_CONTEXT_MANAGER (manager), 0);
+
+        return manager->priv->port;
+}
+
+/**
+ * gupnp_context_manager_get_white_list:
+ * @manager: A #GUPnPContextManager
+ *
+ * Get the #GUPnPWhiteList associated with @manager.
+ *
+ * Returns: (transfer none):  The #GUPnPWhiteList asssociated with this
+ * context manager.
+ */
+GUPnPWhiteList *
+gupnp_context_manager_get_white_list (GUPnPContextManager *manager)
+{
+        g_return_val_if_fail (GUPNP_IS_CONTEXT_MANAGER (manager), NULL);
+
+        return manager->priv->white_list;
+}

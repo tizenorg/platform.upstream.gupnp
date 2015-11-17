@@ -21,7 +21,8 @@ static enum {
 } mode;
 
 static void
-service_proxy_available_cb (GUPnPControlPoint *cp, GUPnPServiceProxy *proxy)
+service_proxy_available_cb (G_GNUC_UNUSED GUPnPControlPoint *cp,
+                            GUPnPServiceProxy               *proxy)
 {
   GError *error = NULL;
   gboolean target;
@@ -77,8 +78,10 @@ main (int argc, char **argv)
   GUPnPContext *context;
   GUPnPControlPoint *cp;
 
-  g_thread_init (NULL);
+#if !GLIB_CHECK_VERSION(2,35,0)
   g_type_init ();
+#endif
+
 
   /* Check and parse command line arguments */
   if (argc != 2) {

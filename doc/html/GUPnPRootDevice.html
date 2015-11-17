@@ -3,12 +3,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>GUPnPRootDevice</title>
-<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
 <link rel="home" href="index.html" title="GUPnP Reference Manual">
 <link rel="up" href="api-device-impl.html" title="Device Implementation">
 <link rel="prev" href="GUPnPDevice.html" title="GUPnPDevice">
 <link rel="next" href="GUPnPService.html" title="GUPnPService">
-<meta name="generator" content="GTK-Doc V1.15.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.18 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -41,7 +41,7 @@
 </tr></table></div>
 <div class="refsynopsisdiv">
 <a name="GUPnPRootDevice.synopsis"></a><h2>Synopsis</h2>
-<pre class="synopsis">                    <a class="link" href="GUPnPRootDevice.html#GUPnPRootDevice-struct" title="GUPnPRootDevice">GUPnPRootDevice</a>;
+<pre class="synopsis">struct              <a class="link" href="GUPnPRootDevice.html#GUPnPRootDevice-struct" title="struct GUPnPRootDevice">GUPnPRootDevice</a>;
 <a class="link" href="GUPnPRootDevice.html" title="GUPnPRootDevice"><span class="returnvalue">GUPnPRootDevice</span></a> *   <a class="link" href="GUPnPRootDevice.html#gupnp-root-device-new" title="gupnp_root_device_new ()">gupnp_root_device_new</a>               (<em class="parameter"><code><a class="link" href="GUPnPContext.html" title="GUPnPContext"><span class="type">GUPnPContext</span></a> *context</code></em>,
                                                          <em class="parameter"><code>const <span class="type">char</span> *description_path</code></em>,
                                                          <em class="parameter"><code>const <span class="type">char</span> *description_dir</code></em>);
@@ -58,6 +58,8 @@ const <span class="returnvalue">char</span> *        <a class="link" href="GUPnP
 const <span class="returnvalue">char</span> *        <a class="link" href="GUPnPRootDevice.html#gupnp-root-device-get-description-dir" title="gupnp_root_device_get_description_dir ()">gupnp_root_device_get_description_dir</a>
                                                         (<em class="parameter"><code><a class="link" href="GUPnPRootDevice.html" title="GUPnPRootDevice"><span class="type">GUPnPRootDevice</span></a> *root_device</code></em>);
 const <span class="returnvalue">char</span> *        <a class="link" href="GUPnPRootDevice.html#gupnp-root-device-get-description-path" title="gupnp_root_device_get_description_path ()">gupnp_root_device_get_description_path</a>
+                                                        (<em class="parameter"><code><a class="link" href="GUPnPRootDevice.html" title="GUPnPRootDevice"><span class="type">GUPnPRootDevice</span></a> *root_device</code></em>);
+<a href="../gssdp/GSSDPResourceGroup.html"><span class="returnvalue">GSSDPResourceGroup</span></a> * <a class="link" href="GUPnPRootDevice.html#gupnp-root-device-get-ssdp-resource-group" title="gupnp_root_device_get_ssdp_resource_group ()">gupnp_root_device_get_ssdp_resource_group</a>
                                                         (<em class="parameter"><code><a class="link" href="GUPnPRootDevice.html" title="GUPnPRootDevice"><span class="type">GUPnPRootDevice</span></a> *root_device</code></em>);
 </pre>
 </div>
@@ -84,19 +86,15 @@ const <span class="returnvalue">char</span> *        <a class="link" href="GUPnP
 <p>
 <a class="link" href="GUPnPRootDevice.html" title="GUPnPRootDevice"><span class="type">GUPnPRootDevice</span></a> allows for implementing root devices.
 </p>
-<p>
-</p>
 </div>
 <div class="refsect1">
 <a name="GUPnPRootDevice.details"></a><h2>Details</h2>
 <div class="refsect2">
-<a name="GUPnPRootDevice-struct"></a><h3>GUPnPRootDevice</h3>
-<pre class="programlisting">typedef struct _GUPnPRootDevice GUPnPRootDevice;</pre>
+<a name="GUPnPRootDevice-struct"></a><h3>struct GUPnPRootDevice</h3>
+<pre class="programlisting">struct GUPnPRootDevice;</pre>
 <p>
 This struct contains private data only, and should be accessed using the
 functions below.
-</p>
-<p>
 </p>
 </div>
 <hr>
@@ -109,8 +107,6 @@ functions below.
 Create a new <a class="link" href="GUPnPRootDevice.html" title="GUPnPRootDevice"><span class="type">GUPnPRootDevice</span></a> object, automatically loading and parsing
 device description document from <em class="parameter"><code>description_path</code></em>.
 </p>
-<p>
-</p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody>
@@ -122,18 +118,15 @@ device description document from <em class="parameter"><code>description_path</c
 <tr>
 <td><p><span class="term"><em class="parameter"><code>description_path</code></em> :</span></p></td>
 <td>Path to device description document. This could either
-be an absolute path or path relative to <em class="parameter"><code>description_dir</code></em>.
-</td>
+be an absolute path or path relative to <em class="parameter"><code>description_dir</code></em>.</td>
 </tr>
 <tr>
 <td><p><span class="term"><em class="parameter"><code>description_dir</code></em> :</span></p></td>
-<td>Path to directory where description documents are provided.
-</td>
+<td>Path to directory where description documents are provided.</td>
 </tr>
 <tr>
 <td><p><span class="term"><span class="emphasis"><em>Returns</em></span> :</span></p></td>
-<td> A new <em class="parameter"><code>GUPnPRootDevice</code></em> object.
-</td>
+<td>A new <em class="parameter"><code>GUPnPRootDevice</code></em> object.</td>
 </tr>
 </tbody>
 </table></div>
@@ -150,8 +143,6 @@ be an absolute path or path relative to <em class="parameter"><code>description_
 Create a new <a class="link" href="GUPnPRootDevice.html" title="GUPnPRootDevice"><span class="type">GUPnPRootDevice</span></a>, automatically loading and parsing
 device description document from <em class="parameter"><code>description_path</code></em> if <em class="parameter"><code>description_doc</code></em> is
 <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>.
-</p>
-<p>
 </p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
@@ -174,18 +165,15 @@ device description document from <em class="parameter"><code>description_path</c
 <tr>
 <td><p><span class="term"><em class="parameter"><code>description_path</code></em> :</span></p></td>
 <td>Path to device description document. This could either
-be an absolute path or path relative to <em class="parameter"><code>description_dir</code></em>.
-</td>
+be an absolute path or path relative to <em class="parameter"><code>description_dir</code></em>.</td>
 </tr>
 <tr>
 <td><p><span class="term"><em class="parameter"><code>description_dir</code></em> :</span></p></td>
-<td>Path to directory where description documents are provided.
-</td>
+<td>Path to directory where description documents are provided.</td>
 </tr>
 <tr>
 <td><p><span class="term"><span class="emphasis"><em>Returns</em></span> :</span></p></td>
-<td> A new <a class="link" href="GUPnPRootDevice.html" title="GUPnPRootDevice"><span class="type">GUPnPRootDevice</span></a> object.
-</td>
+<td>A new <a class="link" href="GUPnPRootDevice.html" title="GUPnPRootDevice"><span class="type">GUPnPRootDevice</span></a> object.</td>
 </tr>
 </tbody>
 </table></div>
@@ -199,8 +187,6 @@ be an absolute path or path relative to <em class="parameter"><code>description_
 Controls whether or not <em class="parameter"><code>root_device</code></em> is available (announcing
 its presence).
 </p>
-<p>
-</p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody>
@@ -212,8 +198,7 @@ its presence).
 <tr>
 <td><p><span class="term"><em class="parameter"><code>available</code></em> :</span></p></td>
 <td>
-<a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if <em class="parameter"><code>root_device</code></em> should be available
-</td>
+<a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if <em class="parameter"><code>root_device</code></em> should be available</td>
 </tr>
 </tbody>
 </table></div>
@@ -225,8 +210,6 @@ its presence).
 <p>
 Get whether or not <em class="parameter"><code>root_device</code></em> is available (announcing its presence).
 </p>
-<p>
-</p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody>
@@ -237,8 +220,8 @@ Get whether or not <em class="parameter"><code>root_device</code></em> is availa
 </tr>
 <tr>
 <td><p><span class="term"><span class="emphasis"><em>Returns</em></span> :</span></p></td>
-<td> <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if <em class="parameter"><code>root_device</code></em> is available, <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#FALSE:CAPS"><code class="literal">FALSE</code></a> otherwise.
-</td>
+<td>
+<a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if <em class="parameter"><code>root_device</code></em> is available, <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#FALSE:CAPS"><code class="literal">FALSE</code></a> otherwise.</td>
 </tr>
 </tbody>
 </table></div>
@@ -251,8 +234,6 @@ Get whether or not <em class="parameter"><code>root_device</code></em> is availa
 <p>
 Get the relative location of <em class="parameter"><code>root_device</code></em>.
 </p>
-<p>
-</p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody>
@@ -263,8 +244,7 @@ Get the relative location of <em class="parameter"><code>root_device</code></em>
 </tr>
 <tr>
 <td><p><span class="term"><span class="emphasis"><em>Returns</em></span> :</span></p></td>
-<td> The relative location of <em class="parameter"><code>root_device</code></em>.
-</td>
+<td>The relative location of <em class="parameter"><code>root_device</code></em>.</td>
 </tr>
 </tbody>
 </table></div>
@@ -278,8 +258,6 @@ Get the relative location of <em class="parameter"><code>root_device</code></em>
 Get the path to the directory containing description documents related to
 <em class="parameter"><code>root_device</code></em>.
 </p>
-<p>
-</p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody>
@@ -290,8 +268,7 @@ Get the path to the directory containing description documents related to
 </tr>
 <tr>
 <td><p><span class="term"><span class="emphasis"><em>Returns</em></span> :</span></p></td>
-<td> The path to description document directory of <em class="parameter"><code>root_device</code></em>.
-</td>
+<td>The path to description document directory of <em class="parameter"><code>root_device</code></em>.</td>
 </tr>
 </tbody>
 </table></div>
@@ -304,7 +281,28 @@ Get the path to the directory containing description documents related to
 <p>
 Get the path to the device description document of <em class="parameter"><code>root_device</code></em>.
 </p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody>
+<tr>
+<td><p><span class="term"><em class="parameter"><code>root_device</code></em> :</span></p></td>
+<td>A <a class="link" href="GUPnPRootDevice.html" title="GUPnPRootDevice"><span class="type">GUPnPRootDevice</span></a>
+</td>
+</tr>
+<tr>
+<td><p><span class="term"><span class="emphasis"><em>Returns</em></span> :</span></p></td>
+<td>The path to device description document of <em class="parameter"><code>root_device</code></em>.</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gupnp-root-device-get-ssdp-resource-group"></a><h3>gupnp_root_device_get_ssdp_resource_group ()</h3>
+<pre class="programlisting"><a href="../gssdp/GSSDPResourceGroup.html"><span class="returnvalue">GSSDPResourceGroup</span></a> * gupnp_root_device_get_ssdp_resource_group
+                                                        (<em class="parameter"><code><a class="link" href="GUPnPRootDevice.html" title="GUPnPRootDevice"><span class="type">GUPnPRootDevice</span></a> *root_device</code></em>);</pre>
 <p>
+Get the <a href="../gssdp/GSSDPResourceGroup.html"><span class="type">GSSDPResourceGroup</span></a> used by <em class="parameter"><code>root_device</code></em>.
 </p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
@@ -316,7 +314,7 @@ Get the path to the device description document of <em class="parameter"><code>r
 </tr>
 <tr>
 <td><p><span class="term"><span class="emphasis"><em>Returns</em></span> :</span></p></td>
-<td> The path to device description document of <em class="parameter"><code>root_device</code></em>.
+<td>The <a href="../gssdp/GSSDPResourceGroup.html"><span class="type">GSSDPResourceGroup</span></a> of <em class="parameter"><code>root_device</code></em>. <span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span>
 </td>
 </tr>
 </tbody>
@@ -331,8 +329,6 @@ Get the path to the device description document of <em class="parameter"><code>r
 <p>
 TRUE if this device is available.
 </p>
-<p>
-</p>
 <p>Default value: FALSE</p>
 </div>
 <hr>
@@ -341,8 +337,6 @@ TRUE if this device is available.
 <pre class="programlisting">  "description-dir"          <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a>*                : Read / Write / Construct Only</pre>
 <p>
 The path to directory where description documents are provided.
-</p>
-<p>
 </p>
 <p>Default value: NULL</p>
 </div>
@@ -353,8 +347,6 @@ The path to directory where description documents are provided.
 <p>
 Device description document. Constructor property.
 </p>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -364,14 +356,12 @@ Device description document. Constructor property.
 The path to device description document. This could either be an
 absolute path or path relative to GUPnPRootDevice:description-dir.
 </p>
-<p>
-</p>
 <p>Default value: NULL</p>
 </div>
 </div>
 </div>
 <div class="footer">
 <hr>
-          Generated by GTK-Doc V1.15.1</div>
+          Generated by GTK-Doc V1.18</div>
 </body>
 </html>

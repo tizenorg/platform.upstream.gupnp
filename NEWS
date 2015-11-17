@@ -1,20 +1,385 @@
-0.14.1
+0.20.5
 ======
 
-Changes since 0.14.0:
-
-- Add sanity checks to GUPnPServiceProxyAction API.
-- Fix handling of accepted locales.
-- Handle unavailability of URL base.
+Changes since 0.20.5:
+ - Add some missing G_{BEGIN,END}_DECLS guards.
+ - Fix uninitialized variable use introduced in previous version.
+ - Add simple network device whitelisting infrastructure.
+ - Port gupnp-binding-tool so it's usable with python3.
+ - Minor code fixes.
+ - Fix crashes in NetworkManager context manager during some async calls.
+ - Fix a small memory leak in the unix and windows CM.
+ - Always enable GTest tests.
+ - Upgrade gtk-doc stuff.
+ - Fix the service example in documentation.
+ - Remove the test for inverted arguments in the GUPnPContext tests.
 
 Bugs fixed in this release:
+ - https://bugzilla.gnome.org/show_bug.cgi?id=694454
+ - https://bugzilla.gnome.org/show_bug.cgi?id=704094
+ - https://bugzilla.gnome.org/show_bug.cgi?id=704383
+ - https://bugzilla.gnome.org/show_bug.cgi?id=705712
+ - https://bugzilla.gnome.org/show_bug.cgi?id=706326
 
-2203 - gupnp-igd does not work on TP-Link TL-R860 due to empty URLBase tag
+All contributors to this release:
+ - Jens Georg <mail@jensge.org>
+ - Ludovic Ferrandis <ludovic.ferrandis@intel.com>
+ - Olivier Crête <olivier.crete@collabora.com>
+ - Bohuslav Kabrda <bkabrda@redhat.com>
+
+0.20.4
+======
+
+Changes since 0.20.3:
+- Fix warnings in gtk-doc run.
+- Some minor improvements to the documentation.
+- Make the user-agent ASCII-only to fix issues with discovery when
+  g_get_application_name () returned a translated string.
+- Force HTTP version to be 1.1 in SOAP requests.
+- Fix potential crashes in XML parsing.
+- Fix potential memory leak in gupnp_service_proxy_send_action_valist.
+- Some codestyle fixes.
+- Add gupnp_device_info_list_dlna_device_class_identifier () to retrieve the
+  content of <dlna:X_DLNADOC> nodes.
+
+Bugs fixed in this release:
+ - https://bugzilla.gnome.org/show_bug.cgi?id=704953
+ - https://bugzilla.gnome.org/show_bug.cgi?id=702555
+ - https://bugzilla.gnome.org/show_bug.cgi?id=704094
+ - https://bugzilla.gnome.org/show_bug.cgi?id=700947
+
+All contributors to this release:
+  Ludovic Ferrandis <ludovic.ferrandis@intel.com>
+  Jens Georg <mail@jensge.org>
+  Sébastien Bianti <sebastien.bianti@linux.intel.com>
+  Bastien Nocera <hadess@hadess.net>
+
+0.20.3
+======
+
+Changes since 0.20.2:
+- Add a gupnp_context_manager_rescan_control_points feature.
+- Fix VAPI generation if g-i version is >= 1.36.
+- Some internal documentation updates.
+- Check SID and return a proper error.
+- Fix error code returned on invalid NT and NTS headers.
+- Fix SEQ to be a uint32.
+- Fall-back to unix static CM if netlink sockets are not availabe on runtime.
+- Prevent some C++ name mangling in the examples.
+- Fix compiling with -Wall -Wextra.
+
+Bugs fixed in this release:
+ - https://bugzilla.gnome.org/show_bug.cgi?id=697314
+ - https://bugzilla.gnome.org/show_bug.cgi?id=696289
+ - https://bugzilla.gnome.org/show_bug.cgi?id=698192
+ - https://bugzilla.gnome.org/show_bug.cgi?id=698125
+
+All contributors to this release:
+  Jens Georg <mail@jensge.org>
+  Jussi Kukkonen <jussi.kukkonen@intel.com>
+  Sébastien Bianti <sebastien.bianti@linux.intel.com>
+
+Changes in dependencies:
+  vapigen >= 0.20 if gobject-introspection is >= 1.36
+
+0.20.2
+======
+
+Changes since 0.20.1:
+- Fix some typos in docs and warning messages.
+- Fix argument order issue introduced with the va_list fix in 0.20.1.
+- Add some tests for this bug.
+
+Bugs fixed in this release:
+ - https://bugzilla.gnome.org/show_bug.cgi?id=695591
+ - https://bugzilla.gnome.org/show_bug.cgi?id=696762
+
+All contributors to this release:
+  Jens Georg <mail@jensge.org>
+  Benjamin Kerensa <bkerensa@ubuntu.com>
+
+0.20.1
+======
+
+Changes since 0.20.0:
+- Fix suspicious use of va_list in the code.
+
+Bugs fixed in this release:
+ - https://bugzilla.gnome.org/show_bug.cgi?id=689813
+
+All contributors to this release:
+  Krzesimir Nowak <krnowak@openismus.com>
+
+0.20.0
+======
+
+Changes since 0.19.4:
+- Fix Accept-Language header generation.
+- Fix some issues with Windows support on mingw64.
+
+Bugs fixed in this release:
+ - https://bugzilla.gnome.org/show_bug.cgi?id=683199
+
+All contributors to this release:
+  Jens Georg <mail@jensge.org>
+
+0.19.4
+======
+
+Changes since 0.19.3:
+- Shuffle around some test data.
+- Fix a GError leak in the linux cm.
+- Fix a leak in variable notification.
+- Clarify usage of gupnp_service_proxy_remove_notify.
+
+All contributors to this release:
+  Jens Georg <mail@jensge.org>
+  Sven Neumann <s.neumann@raumfeld.com>
+  Marcin Nowakowski <marcin.nowakowski@pure.com>
+
+0.19.3
+======
+
+Changes since 0.19.2:
+- Work-around missing notification messages.
+
+All contributors to this release:
+  Jens Georg <mail@jensge.org>
+
+0.19.2
+======
+
+Changes since 0.19.1:
+
+- Support Windows.
+- Fix searching for services in ControlPoint.
+- Drop deprecated calls to g_type_init on glib >= 2.35.
+- Fix LD_LIBRARY_PATH in make check.
+- Explicitly use IPv4 in tests.
+- Allow autogen.sh to be run out-of-tree.
+- Expose GSSDPResourceGroup of a root device.
+
+Bugs fixed in this release:
+ - https://bugzilla.gnome.org/show_bug.cgi?id=687320
+ - https://bugzilla.gnome.org/show_bug.cgi?id=687621
+ - https://bugzilla.gnome.org/show_bug.cgi?id=689028
+ - https://bugzilla.gnome.org/show_bug.cgi?id=688411
+ - https://bugzilla.gnome.org/show_bug.cgi?id=685643
+ - https://bugzilla.gnome.org/show_bug.cgi?id=682580
+ - https://bugzilla.gnome.org/show_bug.cgi?id=672830
+
+All contributors to this release:
+  Jens Georg <mail@jensge.org>
+  Theppitak Karoonboonyanan <thep@linux.thai.net>
+  Stef Walter <stefw@gnome.org>
+  Juan A. Suarez Romero <jasuarez@igalia.com>
+  Alban Browaeys <prahal@yahoo.com>
+
+0.19.1
+======
+Changes since 0.19.0:
+- Include m4 macro for finding vapigen.
+- Run introspection with make distcheck.
+- Lower G-I requirement again.
+- Add gupnp_context_manager_get_port.
+- Don't stop configure if vapigen can't be found.
+- Drop some deprecated stuff from VAPI.
+
+All contributors to this release:
+  Jens Georg <mail@jensge.org>
+
+0.19.0
+======
+
+Changes since 0.18.4:
+
+- Add an abstract base class for simple context managers.
+- Clean-up pkg-config files to not leak libraries.
+- Generate VAPI from GIR file.
+
+Dependency-related changes:
+ - Require gssdp >= 0.13.0
+
+All contributors:
+ Jens Georg <mail@jensge.org>
+ Andreas Henriksson <andreas@fatal.se>
+
+0.18.0
+======
+
+Changes since 0.17.2:
+
+- Fix a crash in Linux context manager if the USB cable is unplugged from a
+  USB network device interface.
+
+All contributors:
+Jens Georg <mail@jensge.org>
+
+0.17.2
+======
+
+Changes since 0.17.1:
+
+- Drop main-context property
+- Fix a small leak from the default-language property.
+- Refactor and clean-up internals of GUPnPContextManager.
+
+Dependency-related changes:
+ - Require gssdp >= 0.11.2.
+
+All contributors:
+Jens Georg <mail@jensge.org>
+
+0.17.1
+======
+
+Changes since 0.17.1:
+
+- Drop deprecated conic support.
+- A Linux context manager. Unlinke the generic static unix context-manger,
+  the Linux context-manager can dynamically react to device and address
+  changes, similar to the NetworkManager-based context-manager, but without
+  depending on DBus or NetworkManager.
+- Fix for a SOAP action parameter validation regression.
+- Updates to the build system such as:
+  - Modernized autotools.
+  - xz tarballs as default.
+- Improved OpenBSD support.
+- More stable RootDevice URIs.
 
 All contributors:
 
+Jens Georg <mail@jensge.org>
+Jasper Lievisse Adriaanse <jasper@humppa.nl>
+Javier Jardón <jjardon@gnome.org>
+Zeeshan Ali (Khattak) <zeeshanak@gnome.org>
+
+0.17.0
+======
+
+Changes since 0.16.1:
+
+- Fix several crashes during initial introspection.
+- Several fixes regarding SOAP action parameter validation.
+- Always append a Content-Language header if the client has an Accept-Language
+  header.
+- Always append an Ext header in SOAP responses.
+- Improve introspection support:
+  * Classes that throw an error during construction implement GInitable.
+  * Update gobject-introspection autotools integration.
+  * Many annotation fixes.
+- Tutorial improvements.
+
+Dependency-related changes:
+ - Require gssdp >= 0.11.0.
+
+All contributors:
+
+Jens Georg <mail@jensge.org>
+Zeeshan Ali (Khattak) <zeeshanak@gnome.org>
+Sven Neumann <s.neumann@raumfeld.com>
+Santakivi Topi <Topi.Santakivi@digia.com>
+
+0.16.1
+======
+
+Changes since 0.16.0:
+
+- Port to new (0.9) NetworkManager APIs.
+- Correction to 'Content-Type' HTTP header values.
+- Satisfy strict compiler checks.
+
+All contributors:
+
+Dan Williams <dcbw@redhat.com>
 Sven Neumann <s.neumann@raumfeld.com>
 Zeeshan Ali (Khattak) <zeeshanak@gnome.org>
+
+0.16.0
+======
+
+Changes since 0.15.1:
+
+- Set the thread context before doing GDBus operations.
+- Use the default timeout on DBus calls.
+- Fix documentation of gupnp_context_manager_new().
+- Remove redundant code.
+- Clear the (obsolete) ChangeLog file.
+- Add some checks on variants.
+- Don't use uninitialized pointer.
+- Some coding-style fixes.
+
+Bugs fixed in this release:
+
+2224 - GUPnP accesses dbus properties without checking that they exist
+2223 - Missing handling of gio-style multi-main-context in GUPnPNetworkManager
+
+All contributors:
+
+Olivier Crête <olivier.crete@collabora.co.uk>
+Zeeshan Ali (Khattak) <zeeshanak@gnome.org>
+Sven Neumann <s.neumann@raumfeld.com>
+Jens Georg <mail@jensge.org>
+Ross Burton <ross@linux.intel.com>
+Luis de Bethencourt <luis@debethencourt.com>
+
+0.15.1
+======
+
+Changes since 0.15.0:
+
+- Set 'ESSID' on WiFi contexts.
+- Fix a crasher bug.
+- Fix some leaks.
+- Remove a cyclic-reference
+- Fix logic to find service from list and therefore the issue of wrongly
+  ignoring new services.
+- Remove all hosted paths from SoupServer before unrefing it.
+
+Dependency related changes:
+
+- Require gssdp >= 0.9.2.
+
+Bugs fixed in this release:
+
+2212 - Leak in gupnp_root_device_construct
+2215 - gupnp-control-point ignores services at startup
+2216 - Leak in gupnp_resource_factory
+2217 - gupnp-unix-context-manager leaks contexts if interfaces are not up
+2218 - gupnp-context creates new SoupServers on shutdown
+
+All contributors:
+
+Zeeshan Ali (Khattak) <zeeshanak@gnome.org>
+Jens Georg <mail@jensge.org>
+
+0.15.0
+======
+
+Changes since 0.14.0 not included in 0.14.1:
+
+- Port from dbus-glib to GDBus.
+- Enable gzip compression for large action response bodies.
+- Fix gupnp-binding-tool to generate headers usable in C++.
+
+Dependency related changes:
+
+- Require glib >= 2.24.0.
+- Require libsoup >= 2.28.2.
+- Require gio >= 2.26 (new dependency).
+- Drop dependency on dbus-glib.
+
+Bugs fixed in this release:
+
+2184 - Migrate from dbus-glib to glib's GDBus
+
+All contributors:
+
+Ross Burton <ross@linux.intel.com>
+Sven Neumann <s.neumann@raumfeld.com>
+Henry Hoegelow <h.hoegelow@raumfeld.com>
+Zeeshan Ali (Khattak) <zeeshanak@gnome.org>
+Fargier Sylvain <fargier.sylvain@free.fr>
 
 0.14.0
 ======

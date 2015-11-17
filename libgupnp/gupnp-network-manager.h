@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Nokia Corporation, all rights reserved.
+ * Copyright (C) 2009 Nokia Corporation.
  *
  * Author: Zeeshan Ali (Khattak) <zeeshanak@gnome.org>
  *                               <zeeshan.ali@nokia.com>
@@ -16,8 +16,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #ifndef __GUPNP_NETWORK_MANAGER_H__
@@ -27,7 +27,7 @@
 
 G_BEGIN_DECLS
 
-GType
+G_GNUC_INTERNAL GType
 gupnp_network_manager_get_type (void) G_GNUC_CONST;
 
 #define GUPNP_TYPE_NETWORK_MANAGER \
@@ -69,8 +69,8 @@ typedef struct {
         void (* _gupnp_reserved4) (void);
 } GUPnPNetworkManagerClass;
 
-gboolean
-gupnp_network_manager_is_available                      (GMainContext *main_context);
+G_GNUC_INTERNAL gboolean
+gupnp_network_manager_is_available                      ();
 
 G_END_DECLS
 

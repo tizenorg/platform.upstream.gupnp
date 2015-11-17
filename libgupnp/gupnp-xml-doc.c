@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006, 2007 OpenedHand Ltd.
- * Copyright (C) 2009 Nokia Corporation, all rights reserved.
+ * Copyright (C) 2009 Nokia Corporation.
  *
  * Author: Jorn Baayen <jorn@openedhand.com>
  *         Zeeshan Ali (Khattak) <zeeshanak@gnome.org>
@@ -18,8 +18,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 /**
@@ -39,7 +39,7 @@ G_DEFINE_TYPE (GUPnPXMLDoc,
                G_TYPE_OBJECT);
 
 static void
-gupnp_xml_doc_init (GUPnPXMLDoc *doc)
+gupnp_xml_doc_init (G_GNUC_UNUSED GUPnPXMLDoc *doc)
 {
         /* Empty */
 }
@@ -102,9 +102,16 @@ gupnp_xml_doc_new_from_path (const char *path,
                              GError    **error)
 {
         xmlDoc *doc;
+        int flags;
+
+        flags = XML_PARSE_PEDANTIC;
+
+        if (!g_getenv ("GUPNP_DEBUG")) {
+                flags |= XML_PARSE_NOWARNING | XML_PARSE_NOERROR;
+        }
 
         g_return_val_if_fail (path != NULL, NULL);
-        doc = xmlRecoverFile (path);
+        doc = xmlReadFile (path, NULL, flags);
         if (doc == NULL) {
                 g_set_error (error,
                              GUPNP_XML_ERROR,

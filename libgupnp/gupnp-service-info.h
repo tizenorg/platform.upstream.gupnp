@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #ifndef __GUPNP_SERVICE_INFO_H__
@@ -56,6 +56,8 @@ gupnp_service_info_get_type (void) G_GNUC_CONST;
                  GUPnPServiceInfoClass))
 
 typedef struct _GUPnPServiceInfoPrivate GUPnPServiceInfoPrivate;
+typedef struct _GUPnPServiceInfo GUPnPServiceInfo;
+typedef struct _GUPnPServiceInfoClass GUPnPServiceInfoClass;
 
 /**
  * GUPnPServiceInfo:
@@ -63,13 +65,13 @@ typedef struct _GUPnPServiceInfoPrivate GUPnPServiceInfoPrivate;
  * This struct contains private data only, and should be accessed using the
  * functions below.
  */
-typedef struct {
+struct _GUPnPServiceInfo {
         GObject parent;
 
         GUPnPServiceInfoPrivate *priv;
-} GUPnPServiceInfo;
+};
 
-typedef struct {
+struct _GUPnPServiceInfoClass {
         GObjectClass parent_class;
 
         /* future padding */
@@ -77,10 +79,10 @@ typedef struct {
         void (* _gupnp_reserved2) (void);
         void (* _gupnp_reserved3) (void);
         void (* _gupnp_reserved4) (void);
-} GUPnPServiceInfoClass;
+};
 
 /**
- * GUPnPServiceIntrospectionCallback
+ * GUPnPServiceIntrospectionCallback:
  * @info: The #GUPnPServiceInfo introspection was requested for
  * @introspection: The new #GUPnPServiceIntrospection object, or NULL
  * @error: The #GError that occurred, or NULL

@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #include <string.h>
@@ -42,7 +42,11 @@ gvalue_util_set_value_from_string (GValue     *value,
                 break;
 
         case G_TYPE_CHAR:
+#if GLIB_CHECK_VERSION(2,32,0)
+                g_value_set_schar (value, *str);
+#else
                 g_value_set_char (value, *str);
+#endif
 
                 break;
 
@@ -175,7 +179,11 @@ gvalue_util_value_append_to_xml_string (const GValue *value,
                 return TRUE;
 
         case G_TYPE_CHAR:
+#if GLIB_CHECK_VERSION(2,32,0)
+                g_string_append_c (str, g_value_get_schar (value));
+#else
                 g_string_append_c (str, g_value_get_char (value));
+#endif
 
                 return TRUE;
 

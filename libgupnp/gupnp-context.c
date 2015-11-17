@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006, 2007, 2008 OpenedHand Ltd.
- * Copyright (C) 2009 Nokia Corporation, all rights reserved.
+ * Copyright (C) 2009 Nokia Corporation.
  *
  * Author: Jorn Baayen <jorn@openedhand.com>
  *         Zeeshan Ali (Khattak) <zeeshanak@gnome.org>
@@ -18,8 +18,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 /**
@@ -30,7 +30,7 @@
  * GUPnP classes. It automatically starts a web server on demand.
  *
  * For debugging, it is possible to see the messages being sent and received by
- * exporting #GUPNP_DEBUG.
+ * exporting <envar>GUPNP_DEBUG</envar>.
  */
 
 #include <config.h>
@@ -40,9 +40,10 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <glib.h>
+#ifndef G_OS_WIN32
 #include <sys/utsname.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <libsoup/soup-address.h>
@@ -50,13 +51,25 @@
 
 #include "gupnp-context.h"
 #include "gupnp-context-private.h"
+#include "gupnp-error.h"
 #include "gupnp-marshal.h"
 #include "gena-protocol.h"
 #include "http-headers.h"
 
-G_DEFINE_TYPE (GUPnPContext,
-               gupnp_context,
-               GSSDP_TYPE_CLIENT);
+#define GUPNP_CONTEXT_DEFAULT_LANGUAGE "en"
+
+static void
+gupnp_context_initable_iface_init (gpointer g_iface,
+                                   gpointer iface_data);
+
+
+G_DEFINE_TYPE_EXTENDED (GUPnPContext,
+                        gupnp_context,
+                        GSSDP_TYPE_CLIENT,
+                        0,
+                        G_IMPLEMENT_INTERFACE
+                                (G_TYPE_INITABLE,
+                                 gupnp_context_initable_iface_init));
 
 struct _GUPnPContextPrivate {
         guint        port;
@@ -67,6 +80,7 @@ struct _GUPnPContextPrivate {
 
         SoupServer  *server; /* Started on demand */
         char        *server_url;
+        char        *default_language;
 
         GList       *host_path_datas;
 };
@@ -76,7 +90,8 @@ enum {
         PROP_PORT,
         PROP_SERVER,
         PROP_SESSION,
-        PROP_SUBSCRIPTION_TIMEOUT
+        PROP_SUBSCRIPTION_TIMEOUT,
+        PROP_DEFAULT_LANGUAGE
 };
 
 typedef struct {
@@ -88,9 +103,12 @@ typedef struct {
 typedef struct {
         char *local_path;
         char *server_path;
+        char *default_language;
 
         GList *user_agents;
 } HostPathData;
+
+static GInitableIface* initable_parent_iface = NULL;
 
 /*
  * Generates the default server ID.
@@ -98,6 +116,20 @@ typedef struct {
 static char *
 make_server_id (void)
 {
+#ifdef G_OS_WIN32
+        OSVERSIONINFO versioninfo;
+        versioninfo.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
+        if (GetVersionEx (&versioninfo)) {
+                return g_strdup_printf ("Microsoft Windows/%ld.%ld"
+                                        " UPnP/1.0 GUPnP/%s",
+                                        versioninfo.dwMajorVersion,
+                                        versioninfo.dwMinorVersion,
+                                        VERSION);
+        } else {
+                return g_strdup_printf ("Microsoft Windows UPnP/1.0 GUPnP/%s",
+                                        VERSION);
+        }
+#else
         struct utsname sysinfo;
 
         uname (&sysinfo);
@@ -106,6 +138,7 @@ make_server_id (void)
                                 sysinfo.sysname,
                                 sysinfo.release,
                                 VERSION);
+#endif
 }
 
 static void
@@ -123,28 +156,34 @@ gupnp_context_init (GUPnPContext *context)
         g_free (server_id);
 }
 
-static GObject *
-gupnp_context_constructor (GType                  type,
-                           guint                  n_props,
-                           GObjectConstructParam *props)
+static gboolean
+gupnp_context_initable_init (GInitable     *initable,
+                             GCancellable  *cancellable,
+                             GError       **error)
 {
-        GObject *object;
-        GUPnPContext *context;
         char *user_agent;
+        GError *inner_error = NULL;
+        GUPnPContext *context;
 
-        object = G_OBJECT_CLASS (gupnp_context_parent_class)->constructor
-                (type, n_props, props);
-        context = GUPNP_CONTEXT (object);
+        if (!initable_parent_iface->init(initable,
+                                         cancellable,
+                                         &inner_error)) {
+                g_propagate_error (error, inner_error);
+
+                return FALSE;
+        }
+
+        context = GUPNP_CONTEXT (initable);
 
         context->priv->session = soup_session_async_new_with_options
                 (SOUP_SESSION_IDLE_TIMEOUT,
                  60,
                  SOUP_SESSION_ASYNC_CONTEXT,
-                 gssdp_client_get_main_context (GSSDP_CLIENT (context)),
+                 g_main_context_get_thread_default (),
                  NULL);
 
         user_agent = g_strdup_printf ("%s GUPnP/" VERSION " DLNADOC/1.50",
-                                      g_get_application_name ()? : "");
+                                      g_get_prgname ()? : "");
         g_object_set (context->priv->session,
                       SOUP_SESSION_USER_AGENT,
                       user_agent,
@@ -158,7 +197,37 @@ gupnp_context_constructor (GType                  type,
                                           SOUP_SESSION_FEATURE (logger));
         }
 
-        return object;
+        soup_session_add_feature_by_type (context->priv->session,
+                                          SOUP_TYPE_CONTENT_DECODER);
+
+        /* Create the server already if the port is not null*/
+        if (context->priv->port != 0) {
+                gupnp_context_get_server (context);
+
+                if (context->priv->server == NULL) {
+                        g_object_unref (context->priv->session);
+                        context->priv->session = NULL;
+
+                        g_set_error (error,
+                                     GUPNP_SERVER_ERROR,
+                                     GUPNP_SERVER_ERROR_OTHER,
+                                     "Could not create HTTP server on port %d",
+                                     context->priv->port);
+
+                        return FALSE;
+                }
+        }
+
+        return TRUE;
+}
+
+static void
+gupnp_context_initable_iface_init (gpointer               g_iface,
+                                   G_GNUC_UNUSED gpointer iface_data)
+{
+        GInitableIface *iface = (GInitableIface *)g_iface;
+        initable_parent_iface = g_type_interface_peek_parent (iface);
+        iface->init = gupnp_context_initable_init;
 }
 
 static void
@@ -177,6 +246,10 @@ gupnp_context_set_property (GObject      *object,
                 break;
         case PROP_SUBSCRIPTION_TIMEOUT:
                 context->priv->subscription_timeout = g_value_get_uint (value);
+                break;
+        case PROP_DEFAULT_LANGUAGE:
+                gupnp_context_set_default_language (context,
+                                                    g_value_get_string (value));
                 break;
         default:
                 G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -212,6 +285,11 @@ gupnp_context_get_property (GObject    *object,
                                   gupnp_context_get_subscription_timeout
                                                                    (context));
                 break;
+        case PROP_DEFAULT_LANGUAGE:
+                g_value_set_string (value,
+                                    gupnp_context_get_default_language
+                                                                   (context));
+                break;
         default:
                 G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
                 break;
@@ -231,17 +309,17 @@ gupnp_context_dispose (GObject *object)
                 context->priv->session = NULL;
         }
 
-        if (context->priv->server) {
-                g_object_unref (context->priv->server);
-                context->priv->server = NULL;
-        }
-
         while (context->priv->host_path_datas) {
                 HostPathData *data;
 
                 data = (HostPathData *) context->priv->host_path_datas->data;
 
                 gupnp_context_unhost_path (context, data->server_path);
+        }
+
+        if (context->priv->server) {
+                g_object_unref (context->priv->server);
+                context->priv->server = NULL;
         }
 
         /* Call super */
@@ -257,6 +335,11 @@ gupnp_context_finalize (GObject *object)
 
         context = GUPNP_CONTEXT (object);
 
+        if (context->priv->default_language) {
+                g_free (context->priv->default_language);
+                context->priv->default_language = NULL;
+        }
+
         g_free (context->priv->server_url);
 
         /* Call super */
@@ -271,7 +354,6 @@ gupnp_context_class_init (GUPnPContextClass *klass)
 
         object_class = G_OBJECT_CLASS (klass);
 
-        object_class->constructor  = gupnp_context_constructor;
         object_class->set_property = gupnp_context_set_property;
         object_class->get_property = gupnp_context_get_property;
         object_class->dispose      = gupnp_context_dispose;
@@ -352,6 +434,25 @@ gupnp_context_class_init (GUPnPContextClass *klass)
                                     G_PARAM_STATIC_NAME |
                                     G_PARAM_STATIC_NICK |
                                     G_PARAM_STATIC_BLURB));
+        /**
+         * GUPnPContext:default-language:
+         *
+         * The content of the Content-Language header id the client
+         * sends Accept-Language and no language-specific pages to serve
+         * exist. The property defaults to 'en'.
+         **/
+        g_object_class_install_property
+                (object_class,
+                 PROP_DEFAULT_LANGUAGE,
+                 g_param_spec_string ("default-language",
+                                      "Default language",
+                                      "Default language",
+                                      GUPNP_CONTEXT_DEFAULT_LANGUAGE,
+                                      G_PARAM_READWRITE |
+                                      G_PARAM_CONSTRUCT |
+                                      G_PARAM_STATIC_NAME |
+                                      G_PARAM_STATIC_NICK |
+                                      G_PARAM_STATIC_BLURB));
 }
 
 /**
@@ -375,12 +476,12 @@ gupnp_context_get_session (GUPnPContext *context)
  * Default server handler: Return 404 not found.
  **/
 static void
-default_server_handler (SoupServer        *server,
-                        SoupMessage       *msg, 
-                        const char        *path,
-                        GHashTable        *query,
-                        SoupClientContext *client,
-                        gpointer           user_data)
+default_server_handler (G_GNUC_UNUSED SoupServer        *server,
+                        SoupMessage                     *msg,
+                        G_GNUC_UNUSED const char        *path,
+                        G_GNUC_UNUSED GHashTable        *query,
+                        G_GNUC_UNUSED SoupClientContext *client,
+                        G_GNUC_UNUSED gpointer           user_data)
 {
         soup_message_set_status (msg, SOUP_STATUS_NOT_FOUND);
 }
@@ -391,7 +492,7 @@ default_server_handler (SoupServer        *server,
  *
  * Get the #SoupServer HTTP server that GUPnP is using.
  *
- * Return value: The #SoupServer used by GUPnP. Do not unref this when finished.
+ * Returns: (transfer none): The #SoupServer used by GUPnP. Do not unref this when finished.
  **/
 SoupServer *
 gupnp_context_get_server (GUPnPContext *context)
@@ -409,17 +510,21 @@ gupnp_context_get_server (GUPnPContext *context)
                         (SOUP_SERVER_PORT,
                          context->priv->port,
                          SOUP_SERVER_ASYNC_CONTEXT,
-                         gssdp_client_get_main_context (GSSDP_CLIENT (context)),
+                         g_main_context_get_thread_default (),
                          SOUP_SERVER_INTERFACE,
                          addr,
                          NULL);
                 g_object_unref (addr);
 
-                soup_server_add_handler (context->priv->server, NULL,
-                                         default_server_handler, context,
-                                         NULL);
+                if (context->priv->server) {
+                        soup_server_add_handler (context->priv->server,
+                                                 NULL,
+                                                 default_server_handler,
+                                                 context,
+                                                 NULL);
 
-                soup_server_run_async (context->priv->server);
+                        soup_server_run_async (context->priv->server);
+                }
         }
 
         return context->priv->server;
@@ -456,28 +561,35 @@ _gupnp_context_get_server_url (GUPnPContext *context)
 
 /**
  * gupnp_context_new:
- * @main_context: A #GMainContext, or %NULL to use the default one
- * @interface: The network interface to use, or %NULL to auto-detect.
+ * @main_context: (allow-none): Deprecated: 0.17.2: Always set to %NULL. If you
+ * want to use a different context, use g_main_context_push_thread_default().
+ * @iface: (allow-none): The network interface to use, or %NULL to
+ * auto-detect.
  * @port: Port to run on, or 0 if you don't care what port is used.
  * @error: A location to store a #GError, or %NULL
  *
- * Create a new #GUPnPContext with the specified @main_context, @interface and
+ * Create a new #GUPnPContext with the specified @main_context, @iface and
  * @port.
  *
  * Return value: A new #GUPnPContext object, or %NULL on an error
  **/
 GUPnPContext *
 gupnp_context_new (GMainContext *main_context,
-                   const char   *interface,
+                   const char   *iface,
                    guint         port,
                    GError      **error)
 {
-        return g_object_new (GUPNP_TYPE_CONTEXT,
-                             "main-context", main_context,
-                             "interface", interface,
-                             "port", port,
-                             "error", error,
-                             NULL);
+        if (main_context)
+                g_warning ("gupnp_context_new::main_context is deprecated."
+                           " Use g_main_context_push_thread_default()"
+                           " instead");
+
+        return g_initable_new (GUPNP_TYPE_CONTEXT,
+                               NULL,
+                               error,
+                               "interface", iface,
+                               "port", port,
+                               NULL);
 }
 
 /**
@@ -552,6 +664,73 @@ gupnp_context_get_subscription_timeout (GUPnPContext *context)
         g_return_val_if_fail (GUPNP_IS_CONTEXT (context), 0);
 
         return context->priv->subscription_timeout;
+}
+
+static void
+host_path_data_set_language (HostPathData *data, const char *language)
+{
+        char *old_language = data->default_language;
+
+        if ((old_language != NULL) && (!strcmp (language, old_language)))
+                return;
+
+        data->default_language = g_strdup (language);
+
+
+        if (old_language != NULL)
+                g_free (old_language);
+}
+
+/**
+ * gupnp_context_set_default_language:
+ * @context: A #GUPnPContext
+ * @language: A language tag as defined in RFC 2616 3.10
+ *
+ * Set the default language for the Content-Length header to @language.
+ *
+ * If the client sends an Accept-Language header the UPnP HTTP server
+ * is required to send a Content-Language header in return. If there are
+ * no files hosted in languages which match the requested ones the
+ * Content-Language header is set to this value. The default value is "en".
+ */
+void
+gupnp_context_set_default_language (GUPnPContext *context,
+                                    const char   *language)
+{
+        g_return_if_fail (GUPNP_IS_CONTEXT (context));
+        g_return_if_fail (language != NULL);
+
+
+        char *old_language = context->priv->default_language;
+
+        if ((old_language != NULL) && (!strcmp (language, old_language)))
+                return;
+
+        context->priv->default_language = g_strdup (language);
+
+        g_list_foreach (context->priv->host_path_datas,
+                        (GFunc) host_path_data_set_language,
+                        (gpointer) language);
+
+        if (old_language != NULL)
+                g_free (old_language);
+}
+
+/**
+ * gupnp_context_get_default_language:
+ * @context: A #GUPnPContext
+ *
+ * Get the default Content-Language header for this context.
+ *
+ * Returns: (transfer none): The default content of the Content-Language
+ * header.
+ */
+const char *
+gupnp_context_get_default_language (GUPnPContext *context)
+{
+        g_return_val_if_fail (GUPNP_IS_CONTEXT (context), NULL);
+
+        return context->priv->default_language;
 }
 
 /* Construct a local path from @requested path, removing the last slash
@@ -646,12 +825,12 @@ redirect_to_folder (SoupMessage *msg)
 /* Serve @path. Note that we do not need to check for path including bogus
  * '..' as libsoup does this for us. */
 static void
-host_path_handler (SoupServer        *server,
-                   SoupMessage       *msg, 
-                   const char        *path,
-                   GHashTable        *query,
-                   SoupClientContext *client,
-                   gpointer           user_data)
+host_path_handler (G_GNUC_UNUSED SoupServer        *server,
+                   SoupMessage                     *msg,
+                   const char                      *path,
+                   G_GNUC_UNUSED GHashTable        *query,
+                   G_GNUC_UNUSED SoupClientContext *client,
+                   gpointer                         user_data)
 {
         char *local_path, *path_to_open;
         struct stat st;
@@ -754,58 +933,67 @@ host_path_handler (SoupServer        *server,
         status = SOUP_STATUS_OK;
 
         if (msg->method == SOUP_METHOD_GET) {
-                gsize offset, length;
                 gboolean have_range;
                 SoupBuffer *buffer;
+                SoupRange *ranges;
+                int nranges;
 
                 /* Find out range */
                 have_range = FALSE;
 
-                offset = 0;
-                length = st.st_size;
+                if (soup_message_headers_get_ranges (msg->request_headers,
+                                                     st.st_size,
+                                                     &ranges,
+                                                     &nranges))
+                        have_range = TRUE;
 
-                if (!http_request_get_range (msg,
-                                             &have_range,
-                                             &offset,
-                                             &length)) {
-                        soup_message_set_status
-                                (msg,
-                                 SOUP_STATUS_REQUESTED_RANGE_NOT_SATISFIABLE);
-
-                        goto DONE;
-                }
-
-                if (have_range && (length > st.st_size - offset ||
+                /* We do not support mulipart/byteranges so only first first */
+                /* range from request is handled */
+                if (have_range && (ranges[0].end > st.st_size ||
                                    st.st_size < 0 ||
-                                   (off_t) offset >= st.st_size)) {
+                                   ranges[0].start >= st.st_size ||
+                                   ranges[0].start > ranges[0].end)) {
                         soup_message_set_status
                                 (msg,
                                  SOUP_STATUS_REQUESTED_RANGE_NOT_SATISFIABLE);
+                        soup_message_headers_free_ranges (msg->request_headers,
+                                                          ranges);
 
                         goto DONE;
                 }
 
                 /* Add requested content */
                 buffer = soup_buffer_new_with_owner
-                             (g_mapped_file_get_contents (mapped_file) + offset,
-                              length,
+                             (g_mapped_file_get_contents (mapped_file),
+                              g_mapped_file_get_length (mapped_file),
                               mapped_file,
                               (GDestroyNotify) g_mapped_file_unref);
 
-                soup_message_body_append_buffer (msg->response_body, buffer);
+                /* Set range and status */
+                if (have_range) {
+                        SoupBuffer *range_buffer;
+
+                        soup_message_body_truncate (msg->response_body);
+                        soup_message_headers_set_content_range (
+                                                          msg->response_headers,
+                                                          ranges[0].start,
+                                                          ranges[0].end,
+                                                          buffer->length);
+                        range_buffer = soup_buffer_new_subbuffer (
+                                           buffer,
+                                           ranges[0].start,
+                                           ranges[0].end - ranges[0].start + 1);
+                        soup_message_body_append_buffer (msg->response_body,
+                                                         range_buffer);
+                        status = SOUP_STATUS_PARTIAL_CONTENT;
+
+                        soup_message_headers_free_ranges (msg->request_headers,
+                                                          ranges);
+                        soup_buffer_free (range_buffer);
+                } else
+                        soup_message_body_append_buffer (msg->response_body, buffer);
 
                 soup_buffer_free (buffer);
-
-                /* Set status */
-                if (have_range) {
-                        http_response_set_content_range (msg,
-                                                         offset,
-                                                         offset + length,
-                                                         st.st_size);
-
-                        status = SOUP_STATUS_PARTIAL_CONTENT;
-                }
-
         } else if (msg->method == SOUP_METHOD_HEAD) {
                 char *length;
 
@@ -831,7 +1019,13 @@ host_path_handler (SoupServer        *server,
 
         /* Set Content-Language */
         if (locales)
-               http_response_set_content_locale (msg, locales->data);
+                http_response_set_content_locale (msg, locales->data);
+        else if (soup_message_headers_get_one (msg->request_headers,
+                                               "Accept-Language")) {
+                soup_message_headers_append (msg->response_headers,
+                                             "Content-Language",
+                                             host_path_data->default_language);
+        }
 
         /* Set Accept-Ranges */
         soup_message_headers_append (msg->response_headers,
@@ -877,7 +1071,8 @@ user_agent_free (UserAgent *agent)
 
 static HostPathData *
 host_path_data_new (const char *local_path,
-                    const char *server_path)
+                    const char *server_path,
+                    const char *default_language)
 {
         HostPathData *path_data;
 
@@ -885,6 +1080,7 @@ host_path_data_new (const char *local_path,
 
         path_data->local_path  = g_strdup (local_path);
         path_data->server_path = g_strdup (server_path);
+        path_data->default_language = g_strdup (default_language);
 
         return path_data;
 }
@@ -894,6 +1090,8 @@ host_path_data_free (HostPathData *path_data)
 {
         g_free (path_data->local_path);
         g_free (path_data->server_path);
+        g_free (path_data->default_language);
+
         while (path_data->user_agents) {
                 UserAgent *agent;
 
@@ -934,7 +1132,8 @@ gupnp_context_host_path (GUPnPContext *context,
         server = gupnp_context_get_server (context);
 
         path_data = host_path_data_new (local_path,
-                                        server_path);
+                                        server_path,
+                                        context->priv->default_language);
 
         soup_server_add_handler (server,
                                  server_path,
@@ -951,6 +1150,7 @@ static unsigned int
 path_compare_func (HostPathData *path_data,
                    const char   *server_path)
 {
+        /* ignore default language */
         return strcmp (path_data->server_path, server_path);
 }
 

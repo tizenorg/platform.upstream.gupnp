@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #ifndef __GUPNP_SERVICE_PROXY_H__
@@ -52,6 +52,8 @@ gupnp_service_proxy_get_type (void) G_GNUC_CONST;
                  GUPnPServiceProxyClass))
 
 typedef struct _GUPnPServiceProxyPrivate GUPnPServiceProxyPrivate;
+typedef struct _GUPnPServiceProxy GUPnPServiceProxy;
+typedef struct _GUPnPServiceProxyClass GUPnPServiceProxyClass;
 
 /**
  * GUPnPServiceProxy:
@@ -59,13 +61,13 @@ typedef struct _GUPnPServiceProxyPrivate GUPnPServiceProxyPrivate;
  * This struct contains private data only, and should be accessed using the
  * functions below.
  */
-typedef struct {
+struct _GUPnPServiceProxy {
         GUPnPServiceInfo parent;
 
         GUPnPServiceProxyPrivate *priv;
-} GUPnPServiceProxy;
+};
 
-typedef struct {
+struct _GUPnPServiceProxyClass {
         GUPnPServiceInfoClass parent_class;
 
         /* signals */
@@ -77,10 +79,10 @@ typedef struct {
         void (* _gupnp_reserved2) (void);
         void (* _gupnp_reserved3) (void);
         void (* _gupnp_reserved4) (void);
-} GUPnPServiceProxyClass;
+};
 
 /**
- * GUPnPServiceProxyAction
+ * GUPnPServiceProxyAction:
  *
  * Opaque structure for holding in-progress action data.
  **/

@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #ifndef __GUPNP_CONTROL_POINT_H__
@@ -56,6 +56,8 @@ gupnp_control_point_get_type (void) G_GNUC_CONST;
                  GUPnPControlPointClass))
 
 typedef struct _GUPnPControlPointPrivate GUPnPControlPointPrivate;
+typedef struct _GUPnPControlPoint GUPnPControlPoint;
+typedef struct _GUPnPControlPointClass GUPnPControlPointClass;
 
 /**
  * GUPnPControlPoint:
@@ -63,13 +65,13 @@ typedef struct _GUPnPControlPointPrivate GUPnPControlPointPrivate;
  * This struct contains private data only, and should be accessed using the
  * functions below.
  */
-typedef struct {
+struct _GUPnPControlPoint {
         GSSDPResourceBrowser parent;
 
         GUPnPControlPointPrivate *priv;
-} GUPnPControlPoint;
+};
 
-typedef struct {
+struct _GUPnPControlPointClass {
         GSSDPResourceBrowserClass parent_class;
 
         /* signals */
@@ -89,7 +91,7 @@ typedef struct {
         void (* _gupnp_reserved1) (void);
         void (* _gupnp_reserved2) (void);
         void (* _gupnp_reserved3) (void);
-} GUPnPControlPointClass;
+};
 
 GUPnPControlPoint *
 gupnp_control_point_new                  (GUPnPContext         *context,
