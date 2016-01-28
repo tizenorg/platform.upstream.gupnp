@@ -13,8 +13,8 @@ BuildRequires:  pkgconfig(gssdp-1.0)
 BuildRequires:  pkgconfig(libsoup-2.4)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(uuid)
-#BuildRequires:  gobject-introspection-devel
-#BuildRequires:  vala
+BuildRequires:  gobject-introspection-devel
+BuildRequires:  vala
 
 
 %description
@@ -33,18 +33,18 @@ Files for development with gupnp.
 
 %prep
 %setup -q -n %{name}-%{version}
-  
-%build  
-%configure --prefix=/usr --with-context-manager=network-manager
-  
-make %{?jobs:-j%jobs}  
-  
-%install  
-rm -rf %{buildroot}  
+
+%build
+%configure --with-context-manager=network-manager --disable-static
+
+make %{?jobs:-j%jobs}
+
+%install
+rm -rf %{buildroot}
 %make_install
-rm -rf %{buildroot}/usr/share/
-mkdir -p %{buildroot}/usr/share/license
-cp COPYING %{buildroot}/usr/share/license/%{name}
+mkdir -p %{buildroot}%{_datadir}/license
+cp COPYING %{buildroot}%{_datadir}/license/%{name}
+rm -rf  %{buildroot}%{_datadir}/gtk-doc
 
 %clean
 rm -rf %{buildroot}
@@ -57,13 +57,16 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %doc
 %{_libdir}/*.so.*
-/usr/share/license/%{name}
+%{_datadir}/license/%{name}
 
 %files devel
 %defattr(-,root,root,-)
-/usr/bin/gupnp-binding-tool
-/usr/include/gupnp-1.0/*
-#/usr/lib/*.a
+%{_bindir}/gupnp-binding-tool
+%{_includedir}/gupnp-1.0/*
 %{_libdir}/*.so
-%{_libdir}/pkgconfig/*
+%{_libdir}/pkgconfig/gupnp-1.0.pc
+%{_libdir}/girepository-1.0/GUPnP-1.0.typelib
+%{_datadir}/gir-1.0/GUPnP-1.0.gir
+%{_datadir}/vala/vapi/gupnp-1.0.deps
+%{_datadir}/vala/vapi/gupnp-1.0.vapi
 
