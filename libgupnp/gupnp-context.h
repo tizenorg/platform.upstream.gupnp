@@ -26,7 +26,12 @@
 #include <libsoup/soup-server.h>
 #include <libsoup/soup-session.h>
 
-G_BEGIN_DECLS
+#ifndef EXPORT_API
+#define EXPORT_API
+#endif // EXPORT_API
+
+
+EXPORT_API G_BEGIN_DECLS
 
 GType
 gupnp_context_get_type (void) G_GNUC_CONST;
@@ -78,7 +83,7 @@ struct _GUPnPContextClass {
         void (* _gupnp_reserved4) (void);
 };
 
-GUPnPContext *
+EXPORT_API GUPnPContext *
 gupnp_context_new                      (GMainContext *main_context,
                                         const char   *iface,
                                         guint         port,
@@ -86,46 +91,46 @@ gupnp_context_new                      (GMainContext *main_context,
 
 #ifndef GUPNP_DISABLE_DEPRECATED
 
-const char *
+EXPORT_API const char *
 gupnp_context_get_host_ip              (GUPnPContext *context);
 
 #endif /* GUPNP_DISABLE_DEPRECATED */
 
-guint
+EXPORT_API guint
 gupnp_context_get_port                 (GUPnPContext *context);
 
-SoupServer *
+EXPORT_API SoupServer *
 gupnp_context_get_server               (GUPnPContext *context);
 
-SoupSession *
+EXPORT_API SoupSession *
 gupnp_context_get_session              (GUPnPContext *context);
 
-void
+EXPORT_API void
 gupnp_context_set_subscription_timeout (GUPnPContext *context,
                                         guint         timeout);
 
-guint
+EXPORT_API guint
 gupnp_context_get_subscription_timeout (GUPnPContext *context);
 
-void
+EXPORT_API void
 gupnp_context_set_default_language     (GUPnPContext *context,
                                         const char   *language);
 
-const char *
+EXPORT_API const char *
 gupnp_context_get_default_language     (GUPnPContext *context);
 
-void
+EXPORT_API void
 gupnp_context_host_path                (GUPnPContext *context,
                                         const char   *local_path,
                                         const char   *server_path);
 
-gboolean
+EXPORT_API gboolean
 gupnp_context_host_path_for_agent      (GUPnPContext *context,
                                         const char   *local_path,
                                         const char   *server_path,
                                         GRegex       *user_agent);
 
-void
+EXPORT_API void
 gupnp_context_unhost_path              (GUPnPContext *context,
                                         const char   *server_path);
 

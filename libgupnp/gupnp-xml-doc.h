@@ -28,6 +28,11 @@
 #include <libxml/tree.h>
 #include <glib-object.h>
 
+#ifndef EXPORT_API
+#define EXPORT_API
+#endif // EXPORT_API
+
+
 G_BEGIN_DECLS
 
 GType
@@ -73,10 +78,10 @@ struct _GUPnPXMLDocClass {
         GObjectClass parent_class;
 };
 
-GUPnPXMLDoc *
+EXPORT_API GUPnPXMLDoc *
 gupnp_xml_doc_new                       (xmlDoc         *xml_doc);
 
-GUPnPXMLDoc *
+EXPORT_API GUPnPXMLDoc *
 gupnp_xml_doc_new_from_path             (const char     *path,
                                          GError        **error);
 

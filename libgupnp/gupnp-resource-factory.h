@@ -26,7 +26,12 @@
 
 #include <glib-object.h>
 
-G_BEGIN_DECLS
+#ifndef EXPORT_API
+#define EXPORT_API
+#endif // EXPORT_API
+
+
+EXPORT_API G_BEGIN_DECLS
 
 GType
 gupnp_resource_factory_get_type (void) G_GNUC_CONST;
@@ -78,30 +83,30 @@ struct _GUPnPResourceFactoryClass {
         void (* _gupnp_reserved4) (void);
 };
 
-GUPnPResourceFactory *
+EXPORT_API GUPnPResourceFactory *
 gupnp_resource_factory_new         (void);
 
-GUPnPResourceFactory *
+EXPORT_API GUPnPResourceFactory *
 gupnp_resource_factory_get_default (void);
 
-void
+EXPORT_API void
 gupnp_resource_factory_register_resource_type
                                    (GUPnPResourceFactory *factory,
                                     const char           *upnp_type,
                                     GType                 type);
 
-gboolean
+EXPORT_API gboolean
 gupnp_resource_factory_unregister_resource_type
                                    (GUPnPResourceFactory *factory,
                                     const char           *upnp_type);
 
-void
+EXPORT_API void
 gupnp_resource_factory_register_resource_proxy_type
                                    (GUPnPResourceFactory *factory,
                                     const char           *upnp_type,
                                     GType                 type);
 
-gboolean
+EXPORT_API gboolean
 gupnp_resource_factory_unregister_resource_proxy_type
                                    (GUPnPResourceFactory *factory,
                                     const char           *upnp_type);

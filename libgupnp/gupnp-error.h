@@ -24,7 +24,12 @@
 
 #include <glib.h>
 
-G_BEGIN_DECLS
+#ifndef EXPORT_API
+#define EXPORT_API
+#endif // EXPORT_API
+
+
+EXPORT_API G_BEGIN_DECLS
 
 GQuark
 gupnp_server_error_quark (void) G_GNUC_CONST;

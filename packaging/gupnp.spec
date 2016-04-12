@@ -35,8 +35,8 @@ Files for development with gupnp.
 %setup -q -n %{name}-%{version}
 
 %build
-export CFLAGS+=" -flto "
-export CXXFLAGS+=" -flto "
+export CFLAGS+=" -flto  -fvisibility=hidden -DEXPORT_API=\"__attribute__((visibility(\\\"default\\\")))\" "
+export CXXFLAGS+=" -flto  -fvisibility=hidden -DEXPORT_API=\"__attribute__((visibility(\\\"default\\\")))\" "
 %configure --prefix=/usr --with-context-manager=network-manager
 
 make %{?jobs:-j%jobs}

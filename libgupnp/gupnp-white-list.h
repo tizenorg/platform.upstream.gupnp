@@ -50,6 +50,11 @@ gupnp_white_list_get_type (void) G_GNUC_CONST;
                 (G_TYPE_INSTANCE_GET_CLASS ((obj), \
                  GUPNP_TYPE_WHITE_LIST, \
                  GUPnPWhiteListClass))
+                 
+                 #ifndef EXPORT_API
+                 #define EXPORT_API
+                 #endif // EXPORT_API
+                 
 
 typedef struct _GUPnPWhiteListPrivate GUPnPWhiteListPrivate;
 typedef struct _GUPnPWhiteList GUPnPWhiteList;
@@ -71,34 +76,34 @@ struct _GUPnPWhiteListClass {
         GObjectClass parent_class;
 };
 
-GUPnPWhiteList *
+EXPORT_API GUPnPWhiteList *
 gupnp_white_list_new            (void);
 
-void
+EXPORT_API void
 gupnp_white_list_set_enabled    (GUPnPWhiteList *white_list,
                                  gboolean enable);
 
-gboolean
+EXPORT_API gboolean
 gupnp_white_list_get_enabled     (GUPnPWhiteList *white_list);
 
-gboolean
+EXPORT_API gboolean
 gupnp_white_list_is_empty       (GUPnPWhiteList *white_list);
 
-gboolean
+EXPORT_API gboolean
 gupnp_white_list_add_entry      (GUPnPWhiteList *white_list,
                                  gchar* entry);
 
-gboolean
+EXPORT_API gboolean
 gupnp_white_list_remove_entry   (GUPnPWhiteList *white_list,
                                  gchar* entry);
 
-GList *
+EXPORT_API GList *
 gupnp_white_list_get_entries    (GUPnPWhiteList *white_list);
 
-void
+EXPORT_API void
 gupnp_white_list_clear          (GUPnPWhiteList *white_list);
 
-gboolean
+EXPORT_API gboolean
 gupnp_white_list_check_context  (GUPnPWhiteList *white_list,
                                  GUPnPContext *context);
 

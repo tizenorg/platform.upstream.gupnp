@@ -52,6 +52,11 @@ gupnp_simple_context_manager_get_type (void) G_GNUC_CONST;
                 (G_TYPE_INSTANCE_GET_CLASS ((obj), \
                  GUPNP_TYPE_SIMPLE_CONTEXT_MANAGER, \
                  GUPnPSimpleContextManagerClass))
+                 
+                 #ifndef EXPORT_API
+                 #define EXPORT_API
+                 #endif // EXPORT_API
+                 
 
 typedef struct _GUPnPSimpleContextManagerPrivate GUPnPSimpleContextManagerPrivate;
 

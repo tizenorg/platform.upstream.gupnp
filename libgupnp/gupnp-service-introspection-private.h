@@ -26,7 +26,12 @@
 
 #include "gupnp-service-introspection.h"
 
-G_GNUC_INTERNAL GUPnPServiceIntrospection *
+G_GNUC_INTERNAL
+
+#ifndef EXPORT_API
+#define EXPORT_API
+#endif // EXPORT_API
+ GUPnPServiceIntrospection *
 gupnp_service_introspection_new (xmlDoc *scpd);
 
 #endif /* __GUPNP_SERVICE_INTROSPECTION_PRIVATE_H__ */

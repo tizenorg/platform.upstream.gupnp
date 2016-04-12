@@ -27,7 +27,7 @@
 
 G_BEGIN_DECLS
 
-GType
+EXPORT_API GType
 gupnp_service_proxy_get_type (void) G_GNUC_CONST;
 
 #define GUPNP_TYPE_SERVICE_PROXY \
@@ -50,6 +50,11 @@ gupnp_service_proxy_get_type (void) G_GNUC_CONST;
                 (G_TYPE_INSTANCE_GET_CLASS ((obj), \
                  GUPNP_TYPE_SERVICE_PROXY, \
                  GUPnPServiceProxyClass))
+
+                 #ifndef EXPORT_API
+                 #define EXPORT_API
+                 #endif // EXPORT_API
+
 
 typedef struct _GUPnPServiceProxyPrivate GUPnPServiceProxyPrivate;
 typedef struct _GUPnPServiceProxy GUPnPServiceProxy;
@@ -117,20 +122,20 @@ typedef void (* GUPnPServiceProxyNotifyCallback) (GUPnPServiceProxy *proxy,
                                                   GValue            *value,
                                                   gpointer           user_data);
 
-gboolean
+EXPORT_API gboolean
 gupnp_service_proxy_send_action    (GUPnPServiceProxy              *proxy,
                                     const char                     *action,
                                     GError                        **error,
                                     ...) G_GNUC_NULL_TERMINATED;
 
-gboolean
+EXPORT_API gboolean
 gupnp_service_proxy_send_action_valist
                                    (GUPnPServiceProxy              *proxy,
                                     const char                     *action,
                                     GError                        **error,
                                     va_list                         var_args);
 
-gboolean
+EXPORT_API gboolean
 gupnp_service_proxy_send_action_hash
                                    (GUPnPServiceProxy              *proxy,
                                     const char                     *action,
@@ -139,7 +144,7 @@ gupnp_service_proxy_send_action_hash
                                     GHashTable                     *out_hash);
 
 
-gboolean
+EXPORT_API gboolean
 gupnp_service_proxy_send_action_list (GUPnPServiceProxy *proxy,
                                       const char        *action,
                                       GError           **error,
@@ -157,7 +162,7 @@ gupnp_service_proxy_begin_action   (GUPnPServiceProxy              *proxy,
                                     gpointer                        user_data,
                                     ...) G_GNUC_NULL_TERMINATED;
 
-GUPnPServiceProxyAction *
+EXPORT_API GUPnPServiceProxyAction *
 gupnp_service_proxy_begin_action_valist
                                    (GUPnPServiceProxy              *proxy,
                                     const char                     *action,
@@ -165,7 +170,7 @@ gupnp_service_proxy_begin_action_valist
                                     gpointer                        user_data,
                                     va_list                         var_args);
 
-GUPnPServiceProxyAction *
+EXPORT_API GUPnPServiceProxyAction *
 gupnp_service_proxy_begin_action_list
                                    (GUPnPServiceProxy              *proxy,
                                     const char                     *action,
@@ -174,7 +179,7 @@ gupnp_service_proxy_begin_action_list
                                     GUPnPServiceProxyActionCallback callback,
                                     gpointer                        user_data);
 
-GUPnPServiceProxyAction *
+EXPORT_API GUPnPServiceProxyAction *
 gupnp_service_proxy_begin_action_hash
                                    (GUPnPServiceProxy              *proxy,
                                     const char                     *action,
@@ -188,14 +193,14 @@ gupnp_service_proxy_end_action     (GUPnPServiceProxy              *proxy,
                                     GError                        **error,
                                     ...) G_GNUC_NULL_TERMINATED;
 
-gboolean
+EXPORT_API gboolean
 gupnp_service_proxy_end_action_valist
                                    (GUPnPServiceProxy              *proxy,
                                     GUPnPServiceProxyAction        *action,
                                     GError                        **error,
                                     va_list                         var_args);
 
-gboolean
+EXPORT_API gboolean
 gupnp_service_proxy_end_action_list
                                   (GUPnPServiceProxy       *proxy,
                                    GUPnPServiceProxyAction *action,
@@ -204,35 +209,35 @@ gupnp_service_proxy_end_action_list
                                    GList                   *out_types,
                                    GList                  **out_values);
 
-gboolean
+EXPORT_API gboolean
 gupnp_service_proxy_end_action_hash
                                    (GUPnPServiceProxy              *proxy,
                                     GUPnPServiceProxyAction        *action,
                                     GError                        **error,
                                     GHashTable                     *hash);
 
-void
+EXPORT_API void
 gupnp_service_proxy_cancel_action  (GUPnPServiceProxy              *proxy,
                                     GUPnPServiceProxyAction        *action);
 
-gboolean
+EXPORT_API gboolean
 gupnp_service_proxy_add_notify     (GUPnPServiceProxy              *proxy,
                                     const char                     *variable,
                                     GType                           type,
                                     GUPnPServiceProxyNotifyCallback callback,
                                     gpointer                        user_data);
 
-gboolean
+EXPORT_API gboolean
 gupnp_service_proxy_remove_notify  (GUPnPServiceProxy              *proxy,
                                     const char                     *variable,
                                     GUPnPServiceProxyNotifyCallback callback,
                                     gpointer                        user_data);
 
-void
+EXPORT_API void
 gupnp_service_proxy_set_subscribed (GUPnPServiceProxy              *proxy,
                                     gboolean                        subscribed);
 
-gboolean
+EXPORT_API gboolean
 gupnp_service_proxy_get_subscribed (GUPnPServiceProxy              *proxy);
 
 G_END_DECLS

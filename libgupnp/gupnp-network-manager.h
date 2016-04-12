@@ -50,6 +50,11 @@ gupnp_network_manager_get_type (void) G_GNUC_CONST;
                 (G_TYPE_INSTANCE_GET_CLASS ((obj), \
                  GUPNP_TYPE_NETWORK_MANAGER, \
                  GUPnPNetworkManagerClass))
+                 
+                 #ifndef EXPORT_API
+                 #define EXPORT_API
+                 #endif // EXPORT_API
+                 
 
 typedef struct _GUPnPNetworkManagerPrivate GUPnPNetworkManagerPrivate;
 

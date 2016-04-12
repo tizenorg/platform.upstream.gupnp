@@ -31,7 +31,7 @@
 
 G_BEGIN_DECLS
 
-GType
+EXPORT_API GType
 gupnp_service_info_get_type (void) G_GNUC_CONST;
 
 #define GUPNP_TYPE_SERVICE_INFO \
@@ -54,6 +54,11 @@ gupnp_service_info_get_type (void) G_GNUC_CONST;
                 (G_TYPE_INSTANCE_GET_CLASS ((obj), \
                  GUPNP_TYPE_SERVICE_INFO, \
                  GUPnPServiceInfoClass))
+
+                 #ifndef EXPORT_API
+                 #define EXPORT_API
+                 #endif // EXPORT_API
+
 
 typedef struct _GUPnPServiceInfoPrivate GUPnPServiceInfoPrivate;
 typedef struct _GUPnPServiceInfo GUPnPServiceInfo;
@@ -96,38 +101,38 @@ typedef void (* GUPnPServiceIntrospectionCallback) (
                                  const GError               *error,
                                  gpointer                    user_data);
 
-GUPnPContext *
+EXPORT_API GUPnPContext *
 gupnp_service_info_get_context                (GUPnPServiceInfo *info);
 
-const char *
+EXPORT_API const char *
 gupnp_service_info_get_location               (GUPnPServiceInfo *info);
 
-const SoupURI *
+EXPORT_API const SoupURI *
 gupnp_service_info_get_url_base               (GUPnPServiceInfo *info);
 
-const char *
+EXPORT_API const char *
 gupnp_service_info_get_udn                    (GUPnPServiceInfo *info);
 
-const char *
+EXPORT_API const char *
 gupnp_service_info_get_service_type           (GUPnPServiceInfo *info);
 
-char *
+EXPORT_API char *
 gupnp_service_info_get_id                     (GUPnPServiceInfo *info);
 
-char *
+EXPORT_API char *
 gupnp_service_info_get_scpd_url               (GUPnPServiceInfo *info);
 
-char *
+EXPORT_API char *
 gupnp_service_info_get_control_url            (GUPnPServiceInfo *info);
 
-char *
+EXPORT_API char *
 gupnp_service_info_get_event_subscription_url (GUPnPServiceInfo *info);
 
-GUPnPServiceIntrospection *
+EXPORT_API GUPnPServiceIntrospection *
 gupnp_service_info_get_introspection          (GUPnPServiceInfo *info,
                                                GError          **error);
 
-void
+EXPORT_API void
 gupnp_service_info_get_introspection_async
                               (GUPnPServiceInfo                 *info,
                                GUPnPServiceIntrospectionCallback callback,

@@ -43,6 +43,11 @@ gupnp_resource_factory_create_device_proxy
                                        const char           *udn,
                                        const char           *location,
                                        const SoupURI        *url_base);
+                                       
+                                       #ifndef EXPORT_API
+                                       #define EXPORT_API
+                                       #endif // EXPORT_API
+                                       
 
 G_GNUC_INTERNAL GUPnPServiceProxy *
 gupnp_resource_factory_create_service_proxy

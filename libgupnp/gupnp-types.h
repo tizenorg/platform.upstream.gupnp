@@ -25,7 +25,12 @@
 
 #include <glib-object.h>
 
-G_BEGIN_DECLS
+#ifndef EXPORT_API
+#define EXPORT_API
+#endif // EXPORT_API
+
+
+EXPORT_API G_BEGIN_DECLS
 
 /**
  * GUPNP_TYPE_BIN_BASE64:

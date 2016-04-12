@@ -26,7 +26,12 @@
 
 #include <glib-object.h>
 
-G_BEGIN_DECLS
+#ifndef EXPORT_API
+#define EXPORT_API
+#endif // EXPORT_API
+
+
+EXPORT_API G_BEGIN_DECLS
 
 GType
 gupnp_service_introspection_get_type (void) G_GNUC_CONST;
@@ -150,28 +155,28 @@ struct _GUPnPServiceIntrospectionClass {
         GObjectClass parent_class;
 };
 
-const GList *
+EXPORT_API const GList *
 gupnp_service_introspection_list_action_names
                                 (GUPnPServiceIntrospection *introspection);
 
-const GList *
+EXPORT_API const GList *
 gupnp_service_introspection_list_actions
                                 (GUPnPServiceIntrospection *introspection);
 
-const GUPnPServiceActionInfo *
+EXPORT_API const GUPnPServiceActionInfo *
 gupnp_service_introspection_get_action
                                 (GUPnPServiceIntrospection *introspection,
                                  const gchar               *action_name);
 
-const GList *
+EXPORT_API const GList *
 gupnp_service_introspection_list_state_variable_names
                                 (GUPnPServiceIntrospection *introspection);
 
-const GList *
+EXPORT_API const GList *
 gupnp_service_introspection_list_state_variables
                                 (GUPnPServiceIntrospection *introspection);
 
-const GUPnPServiceStateVariableInfo *
+EXPORT_API const GUPnPServiceStateVariableInfo *
 gupnp_service_introspection_get_state_variable
                                 (GUPnPServiceIntrospection *introspection,
                                  const gchar               *variable_name);

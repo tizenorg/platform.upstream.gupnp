@@ -32,7 +32,7 @@
 
 G_BEGIN_DECLS
 
-GType
+EXPORT_API GType
 gupnp_device_info_get_type (void) G_GNUC_CONST;
 
 #define GUPNP_TYPE_DEVICE_INFO \
@@ -55,6 +55,11 @@ gupnp_device_info_get_type (void) G_GNUC_CONST;
                 (G_TYPE_INSTANCE_GET_CLASS ((obj), \
                  GUPNP_TYPE_DEVICE_INFO, \
                  GUPnPDeviceInfoClass))
+
+                 #ifndef EXPORT_API
+                 #define EXPORT_API
+                 #endif // EXPORT_API
+
 
 typedef struct _GUPnPDeviceInfoPrivate GUPnPDeviceInfoPrivate;
 typedef struct _GUPnPDeviceInfo GUPnPDeviceInfo;
@@ -94,49 +99,49 @@ struct _GUPnPDeviceInfoClass {
 };
 
 
-GUPnPContext *
+EXPORT_API GUPnPContext *
 gupnp_device_info_get_context            (GUPnPDeviceInfo *info);
 
-const char *
+EXPORT_API const char *
 gupnp_device_info_get_location           (GUPnPDeviceInfo *info);
 
-const SoupURI *
+EXPORT_API const SoupURI *
 gupnp_device_info_get_url_base           (GUPnPDeviceInfo *info);
 
-const char *
+EXPORT_API const char *
 gupnp_device_info_get_udn                (GUPnPDeviceInfo *info);
 
-const char *
+EXPORT_API const char *
 gupnp_device_info_get_device_type        (GUPnPDeviceInfo *info);
 
-char *
+EXPORT_API char *
 gupnp_device_info_get_friendly_name      (GUPnPDeviceInfo *info);
 
-char *
+EXPORT_API char *
 gupnp_device_info_get_manufacturer       (GUPnPDeviceInfo *info);
 
-char *
+EXPORT_API char *
 gupnp_device_info_get_manufacturer_url   (GUPnPDeviceInfo *info);
 
-char *
+EXPORT_API char *
 gupnp_device_info_get_model_description  (GUPnPDeviceInfo *info);
 
-char *
+EXPORT_API char *
 gupnp_device_info_get_model_name         (GUPnPDeviceInfo *info);
 
-char *
+EXPORT_API char *
 gupnp_device_info_get_model_number       (GUPnPDeviceInfo *info);
 
-char *
+EXPORT_API char *
 gupnp_device_info_get_model_url          (GUPnPDeviceInfo *info);
 
-char *
+EXPORT_API char *
 gupnp_device_info_get_serial_number      (GUPnPDeviceInfo *info);
 
-char *
+EXPORT_API char *
 gupnp_device_info_get_upc                (GUPnPDeviceInfo *info);
 
-char *
+EXPORT_API char *
 gupnp_device_info_get_icon_url           (GUPnPDeviceInfo *info,
                                           const char      *requested_mime_type,
                                           int              requested_depth,
@@ -148,39 +153,39 @@ gupnp_device_info_get_icon_url           (GUPnPDeviceInfo *info,
                                           int             *width,
                                           int             *height);
 
-char *
+EXPORT_API char *
 gupnp_device_info_get_presentation_url   (GUPnPDeviceInfo *info);
 
-GList *
+EXPORT_API GList *
 gupnp_device_info_list_dlna_device_class_identifier (GUPnPDeviceInfo *info);
 
-GList *
+EXPORT_API GList *
 gupnp_device_info_list_dlna_capabilities (GUPnPDeviceInfo *info);
 
-char *
+EXPORT_API char *
 gupnp_device_info_get_description_value  (GUPnPDeviceInfo *info,
                                           const char      *element);
-GList *
+EXPORT_API GList *
 gupnp_device_info_list_devices           (GUPnPDeviceInfo *info);
 
-GList *
+EXPORT_API GList *
 gupnp_device_info_list_device_types      (GUPnPDeviceInfo *info);
 
-GUPnPDeviceInfo *
+EXPORT_API GUPnPDeviceInfo *
 gupnp_device_info_get_device             (GUPnPDeviceInfo *info,
                                           const char      *type);
 
-GList *
+EXPORT_API GList *
 gupnp_device_info_list_services          (GUPnPDeviceInfo *info);
 
-GList *
+EXPORT_API GList *
 gupnp_device_info_list_service_types     (GUPnPDeviceInfo *info);
 
-GUPnPServiceInfo *
+EXPORT_API GUPnPServiceInfo *
 gupnp_device_info_get_service            (GUPnPDeviceInfo *info,
                                           const char      *type);
 
-GUPnPResourceFactory *
+EXPORT_API GUPnPResourceFactory *
 gupnp_device_info_get_resource_factory   (GUPnPDeviceInfo *device_info);
 
 G_END_DECLS

@@ -53,6 +53,11 @@ gupnp_windows_context_manager_get_type (void) G_GNUC_CONST;
                 (G_TYPE_INSTANCE_GET_CLASS ((obj), \
                  GUPNP_TYPE_WINDOWS_CONTEXT_MANAGER, \
                  GUPnPWindowsContextManagerClass))
+                 
+                 #ifndef EXPORT_API
+                 #define EXPORT_API
+                 #endif // EXPORT_API
+                 
 
 typedef struct {
         GUPnPSimpleContextManager parent;

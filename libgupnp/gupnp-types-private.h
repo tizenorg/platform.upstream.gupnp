@@ -25,7 +25,12 @@
 
 #include <glib-object.h>
 
-G_BEGIN_DECLS
+#ifndef EXPORT_API
+#define EXPORT_API
+#endif // EXPORT_API
+
+
+EXPORT_API G_BEGIN_DECLS
 
 GType
 gupnp_data_type_to_gtype (const char *data_type);

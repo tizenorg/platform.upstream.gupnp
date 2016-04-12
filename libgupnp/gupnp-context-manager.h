@@ -53,6 +53,11 @@ gupnp_context_manager_get_type (void) G_GNUC_CONST;
                 (G_TYPE_INSTANCE_GET_CLASS ((obj), \
                  GUPNP_TYPE_CONTEXT_MANAGER, \
                  GUPnPContextManagerClass))
+                 
+                 #ifndef EXPORT_API
+                 #define EXPORT_API
+                 #endif // EXPORT_API
+                 
 
 typedef struct _GUPnPContextManagerPrivate GUPnPContextManagerPrivate;
 typedef struct _GUPnPContextManager GUPnPContextManager;
@@ -82,32 +87,32 @@ struct _GUPnPContextManagerClass {
 
 
 #ifndef GUPNP_DISABLE_DEPRECATED
-GUPnPContextManager *
+EXPORT_API GUPnPContextManager *
 gupnp_context_manager_new              (GMainContext *main_context,
                                         guint         port);
 #endif
 
-GUPnPContextManager *
+EXPORT_API GUPnPContextManager *
 gupnp_context_manager_create           (guint port);
 
-void
+EXPORT_API void
 gupnp_context_manager_rescan_control_points
                                        (GUPnPContextManager *manager);
 
-void
+EXPORT_API void
 gupnp_context_manager_manage_control_point
                                        (GUPnPContextManager     *manager,
                                         GUPnPControlPoint       *control_point);
 
-void
+EXPORT_API void
 gupnp_context_manager_manage_root_device
                                        (GUPnPContextManager     *manager,
                                         GUPnPRootDevice         *root_device);
 
-guint
+EXPORT_API guint
 gupnp_context_manager_get_port         (GUPnPContextManager *manager);
 
-GUPnPWhiteList *
+EXPORT_API GUPnPWhiteList *
 gupnp_context_manager_get_white_list   (GUPnPContextManager *manager);
 
 G_END_DECLS

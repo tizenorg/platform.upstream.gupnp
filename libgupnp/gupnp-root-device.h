@@ -56,6 +56,11 @@ gupnp_root_device_get_type (void) G_GNUC_CONST;
                 (G_TYPE_INSTANCE_GET_CLASS ((obj), \
                  GUPNP_TYPE_ROOT_DEVICE, \
                  GUPnPRootDeviceClass))
+                 
+                 #ifndef EXPORT_API
+                 #define EXPORT_API
+                 #endif // EXPORT_API
+                 
 
 typedef struct _GUPnPRootDevicePrivate GUPnPRootDevicePrivate;
 typedef struct _GUPnPRootDevice GUPnPRootDevice;
@@ -83,38 +88,38 @@ struct _GUPnPRootDeviceClass {
         void (* _gupnp_reserved4) (void);
 };
 
-GUPnPRootDevice *
+EXPORT_API GUPnPRootDevice *
 gupnp_root_device_new             (GUPnPContext         *context,
                                    const char           *description_path,
                                    const char           *description_dir);
 
-GUPnPRootDevice *
+EXPORT_API GUPnPRootDevice *
 gupnp_root_device_new_full        (GUPnPContext         *context,
                                    GUPnPResourceFactory *factory,
                                    GUPnPXMLDoc          *description_doc,
                                    const char           *description_path,
                                    const char           *description_dir);
 
-void
+EXPORT_API void
 gupnp_root_device_set_available   (GUPnPRootDevice      *root_device,
                                    gboolean              available);
 
-gboolean
+EXPORT_API gboolean
 gupnp_root_device_get_available   (GUPnPRootDevice      *root_device);
 
-const char *
+EXPORT_API const char *
 gupnp_root_device_get_relative_location
                                   (GUPnPRootDevice      *root_device);
 
-const char *
+EXPORT_API const char *
 gupnp_root_device_get_description_path
                                   (GUPnPRootDevice      *root_device);
 
-const char *
+EXPORT_API const char *
 gupnp_root_device_get_description_dir
                                   (GUPnPRootDevice      *root_device);
 
-GSSDPResourceGroup *
+EXPORT_API GSSDPResourceGroup *
 gupnp_root_device_get_ssdp_resource_group
                                   (GUPnPRootDevice      *root_device);
 

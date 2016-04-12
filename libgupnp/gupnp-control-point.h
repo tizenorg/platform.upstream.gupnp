@@ -54,6 +54,11 @@ gupnp_control_point_get_type (void) G_GNUC_CONST;
                 (G_TYPE_INSTANCE_GET_CLASS ((obj), \
                  GUPNP_TYPE_CONTROL_POINT, \
                  GUPnPControlPointClass))
+                 
+                 #ifndef EXPORT_API
+                 #define EXPORT_API
+                 #endif // EXPORT_API
+                 
 
 typedef struct _GUPnPControlPointPrivate GUPnPControlPointPrivate;
 typedef struct _GUPnPControlPoint GUPnPControlPoint;
@@ -93,25 +98,25 @@ struct _GUPnPControlPointClass {
         void (* _gupnp_reserved3) (void);
 };
 
-GUPnPControlPoint *
+EXPORT_API GUPnPControlPoint *
 gupnp_control_point_new                  (GUPnPContext         *context,
                                           const char           *target);
 
-GUPnPControlPoint *
+EXPORT_API GUPnPControlPoint *
 gupnp_control_point_new_full             (GUPnPContext         *context,
                                           GUPnPResourceFactory *factory,
                                           const char           *target);
 
-GUPnPContext *
+EXPORT_API GUPnPContext *
 gupnp_control_point_get_context          (GUPnPControlPoint    *control_point);
 
-const GList *
+EXPORT_API const GList *
 gupnp_control_point_list_device_proxies  (GUPnPControlPoint    *control_point);
 
-const GList *
+EXPORT_API const GList *
 gupnp_control_point_list_service_proxies (GUPnPControlPoint    *control_point);
 
-GUPnPResourceFactory *
+EXPORT_API GUPnPResourceFactory *
 gupnp_control_point_get_resource_factory (GUPnPControlPoint    *control_point);
 
 G_END_DECLS

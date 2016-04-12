@@ -49,6 +49,11 @@ gupnp_device_proxy_get_type (void) G_GNUC_CONST;
                 (G_TYPE_INSTANCE_GET_CLASS ((obj), \
                  GUPNP_TYPE_DEVICE_PROXY, \
                  GUPnPDeviceProxyClass))
+                 
+                 #ifndef EXPORT_API
+                 #define EXPORT_API
+                 #endif // EXPORT_API
+                 
 
 typedef struct _GUPnPDeviceProxyPrivate GUPnPDeviceProxyPrivate;
 typedef struct _GUPnPDeviceProxy GUPnPDeviceProxy;

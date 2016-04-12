@@ -51,6 +51,11 @@ gupnp_unix_context_manager_get_type (void) G_GNUC_CONST;
                 (G_TYPE_INSTANCE_GET_CLASS ((obj), \
                  GUPNP_TYPE_UNIX_CONTEXT_MANAGER, \
                  GUPnPUnixContextManagerClass))
+                 
+                 #ifndef EXPORT_API
+                 #define EXPORT_API
+                 #endif // EXPORT_API
+                 
 
 typedef struct _GUPnPUnixContextManagerPrivate GUPnPUnixContextManagerPrivate;
 
