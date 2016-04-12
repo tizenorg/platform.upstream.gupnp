@@ -18,8 +18,8 @@ BuildRequires:  pkgconfig(uuid)
 
 
 %description
-GUPnP is an object-oriented open source framework for creating UPnP 
-devices and control points, written in C using GObject and libsoup. 
+GUPnP is an object-oriented open source framework for creating UPnP
+devices and control points, written in C using GObject and libsoup.
 The GUPnP API is intended to be easy to use, efficient and flexible.
 
 %package devel
@@ -33,14 +33,16 @@ Files for development with gupnp.
 
 %prep
 %setup -q -n %{name}-%{version}
-  
-%build  
+
+%build
+export CFLAGS+=" -flto "
+export CXXFLAGS+=" -flto "
 %configure --prefix=/usr --with-context-manager=network-manager
-  
-make %{?jobs:-j%jobs}  
-  
-%install  
-rm -rf %{buildroot}  
+
+make %{?jobs:-j%jobs}
+
+%install
+rm -rf %{buildroot}
 %make_install
 rm -rf %{buildroot}/usr/share/
 mkdir -p %{buildroot}/usr/share/license
@@ -66,4 +68,3 @@ rm -rf %{buildroot}
 #/usr/lib/*.a
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*
-
