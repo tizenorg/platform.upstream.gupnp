@@ -13,8 +13,10 @@ BuildRequires:  pkgconfig(gssdp-1.0)
 BuildRequires:  pkgconfig(libsoup-2.4)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(uuid)
-#BuildRequires:  gobject-introspection-devel
-#BuildRequires:  vala
+%if "%{profile}" == "ivi"
+BuildRequires:  gobject-introspection-devel
+BuildRequires:  vala
+%endif
 
 
 %description
@@ -35,14 +37,18 @@ Files for development with gupnp.
 %setup -q -n %{name}-%{version}
   
 %build  
+%if "%{profile}" == "ivi"
+%configure --prefix=/usr --with-context-manager=network-manager --enable-introspection=yes
+%else
 %configure --prefix=/usr --with-context-manager=network-manager
+%endif
   
 make %{?jobs:-j%jobs}  
   
 %install  
 rm -rf %{buildroot}  
 %make_install
-rm -rf %{buildroot}/usr/share/
+rm -rf %{buildroot}/usr/share/gtk-doc
 mkdir -p %{buildroot}/usr/share/license
 cp COPYING %{buildroot}/usr/share/license/%{name}
 
@@ -66,4 +72,9 @@ rm -rf %{buildroot}
 #/usr/lib/*.a
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*
-
+%if "%{profile}" == "ivi"
+%{_datadir}/gir-1.0/GUPnP-1.0.gir
+%{_libdir}/girepository-1.0/GUPnP-1.0.typelib
+%{_datadir}/vala/vapi/gupnp-1.0.deps
+%{_datadir}/vala/vapi/gupnp-1.0.vapi
+%endif
