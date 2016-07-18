@@ -1,3 +1,9 @@
+%if "%{profile}" == "ivi"
+%define intro yes
+%else
+%define intro no
+%endif
+
 Name: gupnp
 Summary:    GUPnP is an framework for creating UPnP devices & control points
 Version:    0.20.5
@@ -13,13 +19,15 @@ BuildRequires:  pkgconfig(gssdp-1.0)
 BuildRequires:  pkgconfig(libsoup-2.4)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(uuid)
-#BuildRequires:  gobject-introspection-devel
-#BuildRequires:  vala
+%if "%{profile}" == "ivi"
+BuildRequires:  gobject-introspection-devel
+BuildRequires:  vala
+%endif
 
 
 %description
-GUPnP is an object-oriented open source framework for creating UPnP 
-devices and control points, written in C using GObject and libsoup. 
+GUPnP is an object-oriented open source framework for creating UPnP
+devices and control points, written in C using GObject and libsoup.
 The GUPnP API is intended to be easy to use, efficient and flexible.
 
 %package devel
@@ -33,16 +41,16 @@ Files for development with gupnp.
 
 %prep
 %setup -q -n %{name}-%{version}
-  
-%build  
-%configure --prefix=/usr --with-context-manager=network-manager
-  
-make %{?jobs:-j%jobs}  
-  
-%install  
-rm -rf %{buildroot}  
+
+%build
+%configure --prefix=/usr --with-context-manager=network-manager --enable-introspection=%{intro}
+
+make %{?jobs:-j%jobs}
+
+%install
+rm -rf %{buildroot}
 %make_install
-rm -rf %{buildroot}/usr/share/
+rm -rf %{buildroot}/usr/share/gtk-doc
 mkdir -p %{buildroot}/usr/share/license
 cp COPYING %{buildroot}/usr/share/license/%{name}
 
@@ -66,4 +74,9 @@ rm -rf %{buildroot}
 #/usr/lib/*.a
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*
-
+%if "%{profile}" == "ivi"
+%{_datadir}/gir-1.0/GUPnP-1.0.gir
+%{_libdir}/girepository-1.0/GUPnP-1.0.typelib
+%{_datadir}/vala/vapi/gupnp-1.0.deps
+%{_datadir}/vala/vapi/gupnp-1.0.vapi
+%endif
